@@ -7,10 +7,10 @@
 #include "display_sdl.h"
 #include <d3d11.h>
 #include <memory>
-#include <mutex>
 #include <wrl.h>
 
-class DisplayD3D : public DisplaySDL
+namespace SDLFrontend {
+class DisplayD3D final : public DisplaySDL
 {
 public:
   DisplayD3D();
@@ -18,10 +18,12 @@ public:
 
   static std::unique_ptr<DisplayD3D> Create();
 
+  void ResizeFramebuffer(u32 width, u32 height) override;
+  void DisplayFramebuffer() override;
+
 protected:
   bool Initialize() override;
   void OnWindowResized() override;
-  void RenderImpl() override;
 
 private:
   bool UpdateFramebufferTexture();
@@ -43,5 +45,6 @@ private:
   uint32 m_framebuffer_texture_width = 0;
   uint32 m_framebuffer_texture_height = 0;
 };
+} // namespace SDLFrontend
 
 #endif

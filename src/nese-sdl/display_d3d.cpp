@@ -1,16 +1,12 @@
 #ifdef WIN32
 #include "display_d3d.h"
 #include "YBaseLib/Assert.h"
-#include "YBaseLib/Memory.h"
-#include "YBaseLib/String.h"
-//#include "imgui.h"
-//#include "imgui_impl_dx11.h"
 #include <SDL_syswm.h>
 #include <algorithm>
-#include <array>
 
 #pragma comment(lib, "d3d11.lib")
 
+namespace SDLFrontend {
 static const uint32 SWAP_CHAIN_BUFFER_COUNT = 2;
 static const DXGI_FORMAT SWAP_CHAIN_BUFFER_FORMAT = DXGI_FORMAT_R8G8B8A8_UNORM;
 
@@ -170,6 +166,11 @@ bool DisplayD3D::CreateRenderTargetView()
   return SUCCEEDED(hr);
 }
 
+void DisplayD3D::ResizeFramebuffer(u32 width, u32 height)
+{
+  DisplaySDL::ResizeFramebuffer(width, height);
+}
+
 bool DisplayD3D::UpdateFramebufferTexture()
 {
   if (!m_framebuffer_texture || m_framebuffer_texture_width != m_framebuffer_width ||
@@ -221,14 +222,14 @@ bool DisplayD3D::UpdateFramebufferTexture()
   return true;
 }
 
-void DisplayD3D::RenderImpl()
+void DisplayD3D::DisplayFramebuffer()
 {
   if (!UpdateFramebufferTexture())
     return;
 
-  int window_width = int(m_window_width);
-  int window_height = std::max(1, int(m_window_height) - int(MAIN_MENU_BAR_HEIGHT));
-  float display_ratio = float(m_display_width) / float(m_display_height);
+  int window_width = int(m_display_width);
+  int window_height = std::max(1, int(m_display_height));
+  float display_ratio = float(m_display_aspect_numerator) / float(m_display_aspect_denominator);
   float window_ratio = float(window_width) / float(window_height);
   int viewport_width = 1;
   int viewport_height = 1;
@@ -244,10 +245,10 @@ void DisplayD3D::RenderImpl()
   }
 
   int viewport_x = (window_width - viewport_width) / 2;
-  int viewport_y = ((window_height - viewport_height) / 2) + MAIN_MENU_BAR_HEIGHT;
+  int viewport_y = (window_height - viewport_height) / 2;
 
-  std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
-  m_context->ClearRenderTargetView(m_swap_chain_rtv.Get(), clear_color.data());
+  static const float clear_color[] = {0.0f, 0.0f, 0.0f, 1.0f};
+  m_context->ClearRenderTargetView(m_swap_chain_rtv.Get(), clear_color);
 
   m_context->OMSetRenderTargets(1, m_swap_chain_rtv.GetAddressOf(), nullptr);
   m_context->RSSetState(m_rasterizer_state.Get());
@@ -286,10 +287,11 @@ void DisplayD3D::OnWindowResized()
   m_context->OMSetRenderTargets(0, nullptr, nullptr);
   m_swap_chain_rtv.Reset();
 
-  HRESULT hr =
-    m_swap_chain->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, m_window_width, m_window_height, SWAP_CHAIN_BUFFER_FORMAT, 0);
+  HRESULT hr = m_swap_chain->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, m_display_width, m_display_height,
+                                           SWAP_CHAIN_BUFFER_FORMAT, 0);
   if (FAILED(hr) || !CreateRenderTargetView())
     Panic("Failed to resize swap chain buffers.");
 }
+} // namespace SDLFrontend
 
 #endif

@@ -1,13 +1,9 @@
 #include "display_sdl.h"
 #include "YBaseLib/Assert.h"
 #include <SDL.h>
-//#include "imgui.h"
 
-DisplaySDL::DisplaySDL()
-{
-  m_window_width = 512;
-  m_window_height = 512;
-}
+namespace SDLFrontend {
+DisplaySDL::DisplaySDL() {}
 
 DisplaySDL::~DisplaySDL()
 {
@@ -18,8 +14,8 @@ DisplaySDL::~DisplaySDL()
 bool DisplaySDL::Initialize()
 {
   const uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
-  m_window = SDL_CreateWindow("PCE - Initializing...", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_window_width,
-                              m_window_height, flags | GetAdditionalWindowCreateFlags());
+  m_window = SDL_CreateWindow("SDL Display", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_display_width,
+                              m_display_height, flags | GetAdditionalWindowCreateFlags());
   if (!m_window)
     return false;
 
@@ -47,12 +43,6 @@ void DisplaySDL::ResizeFramebuffer(uint32 width, uint32 height)
   }
 }
 
-void DisplaySDL::DisplayFramebuffer()
-{
-  RenderImpl();
-  AddFrameRendered();
-}
-
 bool DisplaySDL::IsFullscreen() const
 {
   return ((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) != 0);
@@ -63,10 +53,22 @@ void DisplaySDL::SetFullscreen(bool enable)
   SDL_SetWindowFullscreen(m_window, enable ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 }
 
+bool DisplaySDL::HandleSDLEvent(const SDL_Event* ev)
+{
+  if (ev->type == SDL_WINDOWEVENT &&
+      (ev->window.event == SDL_WINDOWEVENT_SIZE_CHANGED || ev->window.event == SDL_WINDOWEVENT_RESIZED))
+  {
+    OnWindowResized();
+  }
+
+  return false;
+}
+
 void DisplaySDL::OnWindowResized()
 {
   int width, height;
   SDL_GetWindowSize(m_window, &width, &height);
-  m_window_width = width;
-  m_window_height = height;
+  m_display_width = width;
+  m_display_height = height;
 }
+} // namespace SDLFrontend

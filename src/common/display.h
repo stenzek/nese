@@ -1,6 +1,6 @@
 #pragma once
-#include "YBaseLib/Common.h"
 #include "YBaseLib/Timer.h"
+#include "types.h"
 #include <memory>
 
 class Display
@@ -9,51 +9,49 @@ public:
   Display();
   virtual ~Display();
 
-  uint32 GetFramesRendered() const { return m_frames_rendered; }
+  u32 GetFramesRendered() const { return m_frames_rendered; }
   float GetFramesPerSecond() const { return m_fps; }
   void ResetFramesRendered() { m_frames_rendered = 0; }
 
-  uint32 GetDisplayWidth() const { return m_display_width; }
-  uint32 GetDisplayHeight() const { return m_display_height; }
-  void SetDisplayScale(uint32 scale) { m_display_scale = scale; }
-  void SetDisplayAspectRatio(uint32 numerator, uint32 denominator);
-  virtual void ResizeDisplay(uint32 width = 0, uint32 height = 0);
+  u32 GetDisplayWidth() const { return m_display_width; }
+  u32 GetDisplayHeight() const { return m_display_height; }
+  void SetDisplayScale(u32 scale) { m_display_scale = scale; }
+  void SetDisplayAspectRatio(u32 numerator, u32 denominator);
+  virtual void ResizeDisplay(u32 width = 0, u32 height = 0);
 
-  uint32 GetFramebufferWidth() const { return m_framebuffer_width; }
-  uint32 GetFramebufferHeight() const { return m_framebuffer_height; }
+  u32 GetFramebufferWidth() const { return m_framebuffer_width; }
+  u32 GetFramebufferHeight() const { return m_framebuffer_height; }
   void ClearFramebuffer();
-  virtual void ResizeFramebuffer(uint32 width, uint32 height) = 0;
+  virtual void ResizeFramebuffer(u32 width, u32 height) = 0;
   virtual void DisplayFramebuffer() = 0;
 
-  static constexpr uint32 PackRGB(uint8 r, uint8 g, uint8 b)
+  static constexpr u32 PackRGB(u8 r, u8 g, u8 b)
   {
-    return (static_cast<uint32>(r) << 0) | (static_cast<uint32>(g) << 8) | (static_cast<uint32>(b) << 16) |
-           (static_cast<uint32>(0xFF) << 24);
+    return (static_cast<u32>(r) << 0) | (static_cast<u32>(g) << 8) | (static_cast<u32>(b) << 16) |
+           (static_cast<u32>(0xFF) << 24);
   }
 
-  void SetPixel(uint32 x, uint32 y, uint8 r, uint8 g, uint8 b);
-  void SetPixel(uint32 x, uint32 y, uint32 rgb);
-  void CopyFrame(const void* pixels, uint32 stride);
+  void SetPixel(u32 x, u32 y, u8 r, u8 g, u8 b);
+  void SetPixel(u32 x, u32 y, u32 rgb);
+  void CopyFrame(const void* pixels, u32 stride);
 
 protected:
-  static const uint32 MAIN_MENU_BAR_HEIGHT = 0;
-
   void AddFrameRendered();
 
-  uint32 m_framebuffer_width = 640;
-  uint32 m_framebuffer_height = 480;
-  uint8* m_framebuffer_pointer = nullptr;
-  uint32 m_framebuffer_pitch = 0;
+  u32 m_framebuffer_width = 640;
+  u32 m_framebuffer_height = 480;
+  byte* m_framebuffer_pointer = nullptr;
+  u32 m_framebuffer_pitch = 0;
 
-  uint32 m_display_width = 640;
-  uint32 m_display_height = 480;
-  uint32 m_display_scale = 1;
-  uint32 m_display_aspect_numerator = 1;
-  uint32 m_display_aspect_denominator = 1;
+  u32 m_display_width = 640;
+  u32 m_display_height = 480;
+  u32 m_display_scale = 1;
+  u32 m_display_aspect_numerator = 1;
+  u32 m_display_aspect_denominator = 1;
 
-  static const uint32 FRAME_COUNTER_FRAME_COUNT = 100;
+  static const u32 FRAME_COUNTER_FRAME_COUNT = 100;
   Timer m_frame_counter_timer;
-  uint32 m_frames_rendered = 0;
+  u32 m_frames_rendered = 0;
   float m_fps = 0.0f;
 };
 
@@ -65,6 +63,6 @@ public:
 
   static std::unique_ptr<Display> Create();
 
-  void ResizeFramebuffer(uint32 width, uint32 height) override;
+  void ResizeFramebuffer(u32 width, u32 height) override;
   void DisplayFramebuffer() override;
 };

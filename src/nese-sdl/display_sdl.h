@@ -4,32 +4,34 @@
 #include <memory>
 #include <vector>
 
+union SDL_Event;
 struct SDL_Window;
 
+namespace SDLFrontend {
 class DisplaySDL : public Display
 {
 public:
   DisplaySDL();
   ~DisplaySDL();
 
-  void ResizeDisplay(uint32 width = 0, uint32 height = 0) override;
-  void ResizeFramebuffer(uint32 width, uint32 height) override;
-  void DisplayFramebuffer() override;
+  virtual void ResizeDisplay(u32 width = 0, u32 height = 0) override;
+  virtual void ResizeFramebuffer(u32 width, u32 height) override;
 
   SDL_Window* GetSDLWindow() const { return m_window; }
 
   bool IsFullscreen() const;
   void SetFullscreen(bool enable);
 
+  virtual bool HandleSDLEvent(const SDL_Event* ev);
+
 protected:
-  virtual uint32 GetAdditionalWindowCreateFlags() { return 0; }
+  virtual u32 GetAdditionalWindowCreateFlags() { return 0; }
   virtual bool Initialize();
   virtual void OnWindowResized();
-  virtual void RenderImpl() = 0;
 
   SDL_Window* m_window = nullptr;
-  uint32 m_window_width = 0;
-  uint32 m_window_height = 0;
 
   std::vector<u32> m_framebuffer_data;
 };
+
+} // namespace SDLFrontend

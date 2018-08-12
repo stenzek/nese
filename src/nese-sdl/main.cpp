@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   }
 
   std::unique_ptr<SDLFrontend::Audio> audio = std::make_unique<SDLFrontend::Audio>();
-  std::unique_ptr<DisplayD3D> display = DisplayD3D::Create();
+  std::unique_ptr<SDLFrontend::DisplayD3D> display = SDLFrontend::DisplayD3D::Create();
   if (!display)
     return EXIT_FAILURE;
 
@@ -81,6 +81,9 @@ int main(int argc, char* argv[])
       SDL_Event ev;
       if (!SDL_PollEvent(&ev))
         break;
+
+      if (display->HandleSDLEvent(&ev))
+        continue;
 
       if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP)
       {
