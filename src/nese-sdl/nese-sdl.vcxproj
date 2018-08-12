@@ -11,11 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="audio.h" />
     <ClInclude Include="display_d3d.h" />
     <ClInclude Include="display_gl.h" />
     <ClInclude Include="display_sdl.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="audio.cpp" />
     <ClCompile Include="display_d3d.cpp" />
     <ClCompile Include="display_gl.cpp" />
     <ClCompile Include="display_sdl.cpp" />

@@ -2,7 +2,7 @@
 #include "YBaseLib/ByteStream.h"
 #include "YBaseLib/Error.h"
 #include "YBaseLib/Log.h"
-#include "common/audio.h"
+#include "audio.h"
 #include "nese-sdl/display_d3d.h"
 #include "nese/cartridge.h"
 #include "nese/controller.h"
@@ -11,66 +11,6 @@
 #include <cstdio>
 #include <cstdlib>
 Log_SetChannel(Main);
-
-class AudioSDL final : public Audio
-{
-public:
-  AudioSDL() = default;
-
-  ~AudioSDL()
-  {
-    if (m_is_open)
-      AudioSDL::CloseDevice();
-  }
-
-protected:
-  bool OpenDevice() override final
-  {
-    DebugAssert(!m_is_open);
-
-    SDL_AudioSpec spec = {};
-    spec.freq = m_output_sample_rate;
-    spec.channels = m_channels;
-    spec.format = AUDIO_S16;
-    spec.samples = m_buffer_size;
-    spec.callback = AudioCallback;
-    spec.userdata = static_cast<void*>(this);
-
-    SDL_AudioSpec obtained = {};
-    if (SDL_OpenAudio(&spec, &obtained) < 0)
-    {
-      Log_ErrorPrintf("SDL_OpenAudio failed");
-      return false;
-    }
-
-    m_is_open = true;
-    return true;
-  }
-
-  void PauseDevice(bool paused) override final { SDL_PauseAudio(paused ? 1 : 0); }
-
-  void CloseDevice() override final
-  {
-    DebugAssert(m_is_open);
-    SDL_CloseAudio();
-    m_is_open = false;
-  }
-
-  static void AudioCallback(void* userdata, Uint8* stream, int len)
-  {
-    AudioSDL* const this_ptr = static_cast<AudioSDL*>(userdata);
-    const u32 num_samples = len / sizeof(SampleType) / this_ptr->m_channels;
-    const u32 read_samples = this_ptr->ReadSamples(reinterpret_cast<SampleType*>(stream), num_samples);
-    const u32 silence_samples = num_samples - read_samples;
-    if (silence_samples > 0)
-    {
-      std::memset(reinterpret_cast<SampleType*>(stream) + (read_samples * this_ptr->m_channels), 0,
-                  silence_samples * this_ptr->m_channels * sizeof(SampleType));
-    }
-  }
-
-  bool m_is_open = false;
-};
 
 bool g_running = true;
 
@@ -116,7 +56,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  std::unique_ptr<AudioSDL> audio = std::make_unique<AudioSDL>();
+  std::unique_ptr<SDLFrontend::Audio> audio = std::make_unique<SDLFrontend::Audio>();
   std::unique_ptr<DisplayD3D> display = DisplayD3D::Create();
   if (!display)
     return EXIT_FAILURE;
