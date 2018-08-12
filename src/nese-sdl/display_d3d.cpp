@@ -172,12 +172,8 @@ bool DisplayD3D::CreateRenderTargetView()
 
 bool DisplayD3D::UpdateFramebufferTexture()
 {
-  std::lock_guard<std::mutex> guard(m_framebuffer_mutex);
-  const FrameBuffer& fb = m_framebuffers[m_read_framebuffer_index];
-  if (fb.data.empty())
-    return false;
-
-  if (!m_framebuffer_texture || m_framebuffer_texture_width != fb.width || m_framebuffer_texture_height != fb.height)
+  if (!m_framebuffer_texture || m_framebuffer_texture_width != m_framebuffer_width ||
+      m_framebuffer_texture_height != m_framebuffer_height)
   {
     D3D11_TEXTURE2D_DESC desc =
       CD3D11_TEXTURE2D_DESC(DXGI_FORMAT_R8G8B8A8_UNORM, m_framebuffer_width, m_framebuffer_height, 1, 1,
@@ -198,6 +194,9 @@ bool DisplayD3D::UpdateFramebufferTexture()
       Panic("Failed to create framebuffer texture SRV.");
       return false;
     }
+
+    m_framebuffer_texture_width = m_framebuffer_width;
+    m_framebuffer_texture_height = m_framebuffer_height;
   }
 
   D3D11_MAPPED_SUBRESOURCE sr;
@@ -208,13 +207,13 @@ bool DisplayD3D::UpdateFramebufferTexture()
     return false;
   }
 
-  const byte* src_ptr = reinterpret_cast<const byte*>(fb.data.data());
+  const byte* src_ptr = reinterpret_cast<const byte*>(m_framebuffer_pointer);
   byte* dst_ptr = reinterpret_cast<byte*>(sr.pData);
-  uint32 copy_size = std::min(sr.RowPitch, fb.stride);
-  for (uint32 i = 0; i < fb.height; i++)
+  uint32 copy_size = std::min(sr.RowPitch, m_framebuffer_pitch);
+  for (uint32 i = 0; i < m_framebuffer_height; i++)
   {
     std::memcpy(dst_ptr, src_ptr, copy_size);
-    src_ptr += fb.stride;
+    src_ptr += m_framebuffer_pitch;
     dst_ptr += sr.RowPitch;
   }
 

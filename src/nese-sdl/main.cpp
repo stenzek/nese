@@ -82,9 +82,6 @@ int main(int argc, char* argv[])
       if (!SDL_PollEvent(&ev))
         break;
 
-      if (display->HandleSDLEvent(&ev))
-        continue;
-
       if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP)
       {
         const bool down = (ev.type == SDL_KEYDOWN);
@@ -128,9 +125,6 @@ int main(int argc, char* argv[])
         g_running = false;
       }
     }
-
-    if (display->NeedsRender())
-      display->RenderFrame();
   }
 
   SDL_Quit();

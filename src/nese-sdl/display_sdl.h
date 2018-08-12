@@ -1,11 +1,10 @@
 #pragma once
-
 #include "common/display.h"
-#include <SDL.h>
-#include <array>
+#include "common/types.h"
 #include <memory>
-#include <mutex>
 #include <vector>
+
+struct SDL_Window;
 
 class DisplaySDL : public Display
 {
@@ -18,10 +17,6 @@ public:
   void DisplayFramebuffer() override;
 
   SDL_Window* GetSDLWindow() const { return m_window; }
-  bool IsUIActive() const { return m_ui_active; }
-  bool NeedsRender() const { return m_needs_render || m_ui_active; }
-  bool HandleSDLEvent(const SDL_Event* ev);
-  void RenderFrame();
 
   bool IsFullscreen() const;
   void SetFullscreen(bool enable);
@@ -36,24 +31,5 @@ protected:
   uint32 m_window_width = 0;
   uint32 m_window_height = 0;
 
-  static const uint32 NUM_FRAMEBUFFERS = 2;
-  struct FrameBuffer
-  {
-    std::vector<uint32> data;
-    uint32 stride = 0;
-    uint32 width = 0;
-    uint32 height = 0;
-  };
-
-  std::array<FrameBuffer, NUM_FRAMEBUFFERS> m_framebuffers;
-  uint32 m_read_framebuffer_index = 0;
-  uint32 m_write_framebuffer_index = 0;
-  std::mutex m_framebuffer_mutex;
-
-  uint32 m_render_event_type = 0;
-  bool m_needs_render = false;
-  bool m_ui_active = false;
-
-private:
-  bool PassEventToImGui(const SDL_Event* event);
+  std::vector<u32> m_framebuffer_data;
 };
