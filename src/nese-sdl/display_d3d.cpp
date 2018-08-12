@@ -260,6 +260,8 @@ void DisplayD3D::DisplayFramebuffer()
     m_framebuffer_texture_mapped = true;
     break;
   }
+
+  AddFrameRendered();
 }
 
 void DisplayD3D::OnWindowResized()

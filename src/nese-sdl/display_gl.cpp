@@ -77,8 +77,6 @@ void DisplayGL::ResizeFramebuffer(uint32 width, uint32 height)
 
 void DisplayGL::DisplayFramebuffer()
 {
-  AddFrameRendered();
-
   s32 viewport_x, viewport_y;
   u32 viewport_width, viewport_height;
   CalculateDrawRectangle(&viewport_x, &viewport_y, &viewport_width, &viewport_height);
@@ -109,6 +107,7 @@ void DisplayGL::DisplayFramebuffer()
   glEnd();
 
   SDL_GL_SwapWindow(m_window);
+  AddFrameRendered();
 }
 
 } // namespace SDLFrontend
