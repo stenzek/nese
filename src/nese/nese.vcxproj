@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="apu.h" />
+    <ClInclude Include="audio.h" />
+    <ClInclude Include="bitfield.h" />
+    <ClInclude Include="bus.h" />
+    <ClInclude Include="cartridge.h" />
+    <ClInclude Include="controller.h" />
+    <ClInclude Include="cpu.h" />
+    <ClInclude Include="cpu_instruction_list.h" />
+    <ClInclude Include="display.h" />
+    <ClInclude Include="display_d3d.h" />
+    <ClInclude Include="display_gl.h" />
+    <ClInclude Include="display_sdl.h" />
+    <ClInclude Include="mappers\gxrom.h" />
+    <ClInclude Include="mappers\mmc1.h" />
+    <ClInclude Include="mappers\uxrom.h" />
+    <ClInclude Include="ppu.h" />
+    <ClInclude Include="system.h" />
+    <ClInclude Include="types.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="apu.cpp" />
+    <ClCompile Include="audio.cpp" />
+    <ClCompile Include="bus.cpp" />
+    <ClCompile Include="cartridge.cpp" />
+    <ClCompile Include="controller.cpp" />
+    <ClCompile Include="cpu.cpp" />
+    <ClCompile Include="cpu_disasm.cpp" />
+    <ClCompile Include="cpu_instr.cpp" />
+    <ClCompile Include="display.cpp" />
+    <ClCompile Include="display_d3d.cpp" />
+    <ClCompile Include="display_gl.cpp" />
+    <ClCompile Include="display_sdl.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mappers\gxrom.cpp" />
+    <ClCompile Include="mappers\mmc1.cpp" />
+    <ClCompile Include="mappers\uxrom.cpp" />
+    <ClCompile Include="ppu.cpp" />
+    <ClCompile Include="system.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\dep\Nes_Snd_Emu\Nes_Snd_Emu.vcxproj">
+      <Project>{3bb166bb-9d34-4ec7-9c89-5138795b0b4d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\dep\YBaseLib\Source\YBaseLib.vcxproj">
+      <Project>{b56ce698-7300-4fa5-9609-942f1d05c5a2}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="bitfield.natvis" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1F82D955-F840-4599-99B9-E94559EF6169}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>nese</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(ProjectName)-$(Platform)-$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)-$(Platform)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)build\$(ProjectName)-$(Platform)-$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)-$(Platform)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\msvc\include\SDL;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dep\msvc\lib32-debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\msvc\include\SDL;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)dep\msvc\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

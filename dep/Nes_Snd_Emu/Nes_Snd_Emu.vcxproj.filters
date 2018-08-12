@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="nes_apu\blargg_source.h" />
+    <ClInclude Include="nes_apu\Blip_Buffer.h" />
+    <ClInclude Include="nes_apu\Blip_Synth.h" />
+    <ClInclude Include="nes_apu\Multi_Buffer.h" />
+    <ClInclude Include="nes_apu\Nes_Apu.h" />
+    <ClInclude Include="nes_apu\Nes_Namco.h" />
+    <ClInclude Include="nes_apu\Nes_Oscs.h" />
+    <ClInclude Include="nes_apu\Nes_Vrc6.h" />
+    <ClInclude Include="nes_apu\Nonlinear_Buffer.h" />
+    <ClInclude Include="nes_apu\apu_snapshot.h" />
+    <ClInclude Include="nes_apu\blargg_common.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nes_apu\Blip_Buffer.cpp" />
+    <ClCompile Include="nes_apu\Multi_Buffer.cpp" />
+    <ClCompile Include="nes_apu\Nes_Apu.cpp" />
+    <ClCompile Include="nes_apu\Nes_Namco.cpp" />
+    <ClCompile Include="nes_apu\Nes_Oscs.cpp" />
+    <ClCompile Include="nes_apu\Nes_Vrc6.cpp" />
+    <ClCompile Include="nes_apu\Nonlinear_Buffer.cpp" />
+    <ClCompile Include="nes_apu\apu_snapshot.cpp" />
+  </ItemGroup>
+</Project>
