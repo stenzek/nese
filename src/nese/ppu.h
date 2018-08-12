@@ -1,5 +1,5 @@
 #pragma once
-#include "bitfield.h"
+#include "common/bitfield.h"
 #include "types.h"
 
 class System;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "display.h"
+#include "common/display.h"
 #include <SDL.h>
 #include <array>
 #include <memory>

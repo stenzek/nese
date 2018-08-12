@@ -2,14 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="apu.h" />
-    <ClInclude Include="audio.h" />
-    <ClInclude Include="bitfield.h" />
     <ClInclude Include="bus.h" />
     <ClInclude Include="cartridge.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cpu.h" />
     <ClInclude Include="cpu_instruction_list.h" />
-    <ClInclude Include="display.h" />
     <ClInclude Include="display_d3d.h" />
     <ClInclude Include="display_gl.h" />
     <ClInclude Include="display_sdl.h" />
@@ -28,14 +25,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="apu.cpp" />
-    <ClCompile Include="audio.cpp" />
     <ClCompile Include="bus.cpp" />
     <ClCompile Include="cartridge.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="cpu.cpp" />
     <ClCompile Include="cpu_disasm.cpp" />
     <ClCompile Include="cpu_instr.cpp" />
-    <ClCompile Include="display.cpp" />
     <ClCompile Include="display_d3d.cpp" />
     <ClCompile Include="display_gl.cpp" />
     <ClCompile Include="display_sdl.cpp" />
@@ -51,9 +46,6 @@
     <ClCompile Include="mappers\uxrom.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="bitfield.natvis" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="mappers">

@@ -11,70 +11,42 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apu.h" />
-    <ClInclude Include="bus.h" />
-    <ClInclude Include="cartridge.h" />
-    <ClInclude Include="controller.h" />
-    <ClInclude Include="cpu.h" />
-    <ClInclude Include="cpu_instruction_list.h" />
-    <ClInclude Include="display_d3d.h" />
-    <ClInclude Include="display_gl.h" />
-    <ClInclude Include="display_sdl.h" />
-    <ClInclude Include="mappers\gxrom.h" />
-    <ClInclude Include="mappers\mmc1.h" />
-    <ClInclude Include="mappers\uxrom.h" />
-    <ClInclude Include="ppu.h" />
-    <ClInclude Include="system.h" />
+    <ClInclude Include="audio.h" />
+    <ClInclude Include="bitfield.h" />
+    <ClInclude Include="display.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="apu.cpp" />
-    <ClCompile Include="bus.cpp" />
-    <ClCompile Include="cartridge.cpp" />
-    <ClCompile Include="controller.cpp" />
-    <ClCompile Include="cpu.cpp" />
-    <ClCompile Include="cpu_disasm.cpp" />
-    <ClCompile Include="cpu_instr.cpp" />
-    <ClCompile Include="display_d3d.cpp" />
-    <ClCompile Include="display_gl.cpp" />
-    <ClCompile Include="display_sdl.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="mappers\gxrom.cpp" />
-    <ClCompile Include="mappers\mmc1.cpp" />
-    <ClCompile Include="mappers\uxrom.cpp" />
-    <ClCompile Include="ppu.cpp" />
-    <ClCompile Include="system.cpp" />
+    <ClCompile Include="audio.cpp" />
+    <ClCompile Include="display.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\dep\Nes_Snd_Emu\Nes_Snd_Emu.vcxproj">
-      <Project>{3bb166bb-9d34-4ec7-9c89-5138795b0b4d}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\dep\YBaseLib\Source\YBaseLib.vcxproj">
       <Project>{b56ce698-7300-4fa5-9609-942f1d05c5a2}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\common\common.vcxproj">
-      <Project>{0d2c8dba-3b04-4b19-b69f-f878a7a16225}</Project>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="bitfield.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1F82D955-F840-4599-99B9-E94559EF6169}</ProjectGuid>
+    <ProjectGuid>{0D2C8DBA-3B04-4B19-B69F-F878A7A16225}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>nese</RootNamespace>
+    <RootNamespace>common</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -88,13 +60,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)build\$(ProjectName)-$(Platform)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)-$(Platform)-$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)-$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)build\$(ProjectName)-$(Platform)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ProjectName)-$(Platform)-$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)-$(Platform)</TargetName>
   </PropertyGroup>
@@ -107,7 +79,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\msvc\include\SDL;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +98,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\msvc\include\SDL;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

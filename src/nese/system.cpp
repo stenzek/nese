@@ -1,9 +1,9 @@
 #include "system.h"
 #include "YBaseLib/Timer.h"
 #include "apu.h"
-#include "audio.h"
 #include "bus.h"
 #include "cartridge.h"
+#include "common/audio.h"
 #include "cpu.h"
 #include "ppu.h"
 

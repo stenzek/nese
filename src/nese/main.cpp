@@ -2,7 +2,7 @@
 #include "YBaseLib/ByteStream.h"
 #include "YBaseLib/Error.h"
 #include "YBaseLib/Log.h"
-#include "nese/audio.h"
+#include "common/audio.h"
 #include "nese/cartridge.h"
 #include "nese/controller.h"
 #include "nese/display_d3d.h"

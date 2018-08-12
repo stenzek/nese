@@ -4,8 +4,8 @@
 #include "YBaseLib/Log.h"
 #include "YBaseLib/Memory.h"
 #include "bus.h"
+#include "common/display.h"
 #include "cpu.h"
-#include "display.h"
 #include "system.h"
 Log_SetChannel(PPU);
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "display.h"
+#include "common/display.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <memory>

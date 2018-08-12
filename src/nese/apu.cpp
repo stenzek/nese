@@ -1,7 +1,7 @@
 #include "apu.h"
 #include "YBaseLib/Timer.h"
-#include "audio.h"
 #include "bus.h"
+#include "common/audio.h"
 #include "nes_apu/Blip_Buffer.h"
 #include "nes_apu/Nes_Apu.h"
 #include "nes_apu/apu_snapshot.h"
