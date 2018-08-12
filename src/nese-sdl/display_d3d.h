@@ -26,7 +26,6 @@ protected:
   void OnWindowResized() override;
 
 private:
-  bool UpdateFramebufferTexture();
   bool CreateRenderTargetView();
 
   Microsoft::WRL::ComPtr<ID3D11Device> m_device = nullptr;
@@ -42,8 +41,7 @@ private:
   Microsoft::WRL::ComPtr<ID3D11Texture2D> m_framebuffer_texture = nullptr;
   Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_framebuffer_texture_srv = nullptr;
 
-  uint32 m_framebuffer_texture_width = 0;
-  uint32 m_framebuffer_texture_height = 0;
+  bool m_framebuffer_texture_mapped = false;
 };
 } // namespace SDLFrontend
 

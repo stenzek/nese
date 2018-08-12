@@ -52,10 +52,8 @@ DisplayD3D::DisplayD3D() = default;
 
 DisplayD3D::~DisplayD3D()
 {
-#if 0
-  if (m_device && m_context)
-    ImGui_ImplDX11_Shutdown();
-#endif
+  if (m_framebuffer_texture_mapped)
+    m_context->Unmap(m_framebuffer_texture.Get(), 0);
 }
 
 std::unique_ptr<DisplayD3D> DisplayD3D::Create()
@@ -134,18 +132,16 @@ bool DisplayD3D::Initialize()
     return false;
 
   D3D11_SAMPLER_DESC ss_desc = CD3D11_SAMPLER_DESC(CD3D11_DEFAULT());
-  ss_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-  // ss_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+  // ss_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+  ss_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
   hr = m_device->CreateSamplerState(&ss_desc, m_sampler_state.GetAddressOf());
   if (FAILED(hr))
     return false;
 
-#if 0
-  if (!ImGui_ImplDX11_Init(info.info.win.window, m_device.Get(), m_context.Get()))
+  ResizeFramebuffer(m_framebuffer_width, m_framebuffer_height);
+  if (!m_framebuffer_texture_mapped)
     return false;
 
-  ImGui_ImplDX11_NewFrame();
-#endif
   return true;
 }
 
@@ -168,65 +164,66 @@ bool DisplayD3D::CreateRenderTargetView()
 
 void DisplayD3D::ResizeFramebuffer(u32 width, u32 height)
 {
-  DisplaySDL::ResizeFramebuffer(width, height);
-}
+  if (m_framebuffer_texture && m_framebuffer_width == width && m_framebuffer_height == height)
+    return;
 
-bool DisplayD3D::UpdateFramebufferTexture()
-{
-  if (!m_framebuffer_texture || m_framebuffer_texture_width != m_framebuffer_width ||
-      m_framebuffer_texture_height != m_framebuffer_height)
+  Microsoft::WRL::ComPtr<ID3D11Texture2D> framebuffer_texture;
+  Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> framebuffer_texture_srv;
+
+  D3D11_TEXTURE2D_DESC desc =
+    CD3D11_TEXTURE2D_DESC(DXGI_FORMAT_R8G8B8A8_UNORM, width, height, 1, 1, D3D11_BIND_SHADER_RESOURCE,
+                          D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
+  HRESULT hr = m_device->CreateTexture2D(&desc, nullptr, framebuffer_texture.ReleaseAndGetAddressOf());
+  if (FAILED(hr))
   {
-    D3D11_TEXTURE2D_DESC desc =
-      CD3D11_TEXTURE2D_DESC(DXGI_FORMAT_R8G8B8A8_UNORM, m_framebuffer_width, m_framebuffer_height, 1, 1,
-                            D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
-    HRESULT hr = m_device->CreateTexture2D(&desc, nullptr, m_framebuffer_texture.ReleaseAndGetAddressOf());
-    if (FAILED(hr))
-    {
-      Panic("Failed to create framebuffer texture.");
-      return false;
-    }
+    Panic("Failed to create framebuffer texture.");
+    return;
+  }
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc =
-      CD3D11_SHADER_RESOURCE_VIEW_DESC(m_framebuffer_texture.Get(), D3D11_SRV_DIMENSION_TEXTURE2D);
-    hr = m_device->CreateShaderResourceView(m_framebuffer_texture.Get(), &srv_desc,
-                                            m_framebuffer_texture_srv.ReleaseAndGetAddressOf());
-    if (FAILED(hr))
-    {
-      Panic("Failed to create framebuffer texture SRV.");
-      return false;
-    }
-
-    m_framebuffer_texture_width = m_framebuffer_width;
-    m_framebuffer_texture_height = m_framebuffer_height;
+  D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc =
+    CD3D11_SHADER_RESOURCE_VIEW_DESC(framebuffer_texture.Get(), D3D11_SRV_DIMENSION_TEXTURE2D);
+  hr = m_device->CreateShaderResourceView(framebuffer_texture.Get(), &srv_desc,
+                                          framebuffer_texture_srv.ReleaseAndGetAddressOf());
+  if (FAILED(hr))
+  {
+    Panic("Failed to create framebuffer texture SRV.");
+    return;
   }
 
   D3D11_MAPPED_SUBRESOURCE sr;
-  HRESULT hr = m_context->Map(m_framebuffer_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &sr);
+  hr = m_context->Map(framebuffer_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &sr);
   if (FAILED(hr))
   {
     Panic("Failed to map framebuffer texture.");
-    return false;
+    return;
   }
 
-  const byte* src_ptr = reinterpret_cast<const byte*>(m_framebuffer_pointer);
-  byte* dst_ptr = reinterpret_cast<byte*>(sr.pData);
-  uint32 copy_size = std::min(sr.RowPitch, m_framebuffer_pitch);
-  for (uint32 i = 0; i < m_framebuffer_height; i++)
+  // Unmap old framebuffer before releasing it.
+  if (m_framebuffer_texture_mapped)
   {
-    std::memcpy(dst_ptr, src_ptr, copy_size);
-    src_ptr += m_framebuffer_pitch;
-    dst_ptr += sr.RowPitch;
+    m_context->Unmap(m_framebuffer_texture.Get(), 0);
+    m_framebuffer_texture_mapped = false;
   }
 
-  m_context->Unmap(m_framebuffer_texture.Get(), 0);
-  return true;
+  m_framebuffer_width = width;
+  m_framebuffer_height = height;
+  m_framebuffer_texture = std::move(framebuffer_texture);
+  m_framebuffer_texture_srv = std::move(framebuffer_texture_srv);
+  m_framebuffer_pointer = reinterpret_cast<byte*>(sr.pData);
+  m_framebuffer_pitch = sr.RowPitch;
+  m_framebuffer_texture_mapped = true;
 }
 
 void DisplayD3D::DisplayFramebuffer()
 {
-  if (!UpdateFramebufferTexture())
-    return;
+  // Unmap framebuffer before displaying.
+  if (m_framebuffer_texture_mapped)
+  {
+    m_context->Unmap(m_framebuffer_texture.Get(), 0);
+    m_framebuffer_texture_mapped = false;
+  }
 
+  // Calculate render rectangle based on aspect ratio.
   int window_width = int(m_display_width);
   int window_height = std::max(1, int(m_display_height));
   float display_ratio = float(m_display_aspect_numerator) / float(m_display_aspect_denominator);
@@ -267,17 +264,25 @@ void DisplayD3D::DisplayFramebuffer()
 
   m_context->Draw(3, 0);
 
-#if 0
-  ImGui::Render();
-  ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#endif
-
   // m_swap_chain->Present(0, 0);
   m_swap_chain->Present(1, 0);
 
-#if 0
-  ImGui_ImplDX11_NewFrame();
-#endif
+  // Re-map framebuffer texture.
+  for (;;)
+  {
+    D3D11_MAPPED_SUBRESOURCE sr;
+    HRESULT hr = m_context->Map(m_framebuffer_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &sr);
+    if (FAILED(hr))
+    {
+      Panic("Failed to map framebuffer texture.");
+      continue;
+    }
+
+    m_framebuffer_pointer = reinterpret_cast<byte*>(sr.pData);
+    m_framebuffer_pitch = sr.RowPitch;
+    m_framebuffer_texture_mapped = true;
+    break;
+  }
 }
 
 void DisplayD3D::OnWindowResized()
