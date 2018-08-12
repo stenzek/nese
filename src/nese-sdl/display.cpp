@@ -1,5 +1,7 @@
 #include "display.h"
 #include "YBaseLib/Assert.h"
+#include "display_d3d.h"
+#include "display_gl.h"
 #include <SDL.h>
 
 namespace SDLFrontend {
@@ -9,6 +11,23 @@ Display::~Display()
 {
   if (m_window)
     SDL_DestroyWindow(m_window);
+}
+
+std::unique_ptr<Display> Display::Create()
+{
+  std::unique_ptr<Display> display;
+
+  // Use D3D on windows by default, otherwise GL.
+#if defined(Y_PLATFORM_WINDOWS) && true
+  display = std::make_unique<DisplayD3D>();
+#else
+  display = std::make_unique<DisplayGL>();
+#endif
+
+  if (!display->Initialize())
+    display.reset();
+
+  return display;
 }
 
 bool Display::Initialize()

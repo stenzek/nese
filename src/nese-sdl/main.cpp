@@ -58,8 +58,7 @@ int main(int argc, char* argv[])
   }
 
   std::unique_ptr<SDLFrontend::Audio> audio = std::make_unique<SDLFrontend::Audio>();
-  // std::unique_ptr<SDLFrontend::DisplayD3D> display = SDLFrontend::DisplayD3D::Create();
-  std::unique_ptr<SDLFrontend::DisplayGL> display = SDLFrontend::DisplayGL::Create();
+  std::unique_ptr<SDLFrontend::Display> display = SDLFrontend::Display::Create();
   if (!display)
     return EXIT_FAILURE;
 

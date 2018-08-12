@@ -21,15 +21,6 @@ DisplayGL::~DisplayGL()
   }
 }
 
-std::unique_ptr<DisplayGL> DisplayGL::Create()
-{
-  std::unique_ptr<DisplayGL> display = std::make_unique<DisplayGL>();
-  if (!display->Initialize())
-    display.reset();
-
-  return display;
-}
-
 bool DisplayGL::Initialize()
 {
   if (!Display::Initialize())

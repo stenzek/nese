@@ -14,14 +14,16 @@ public:
   Display();
   ~Display();
 
+  static std::unique_ptr<Display> Create();
+
   virtual void ResizeDisplay(u32 width = 0, u32 height = 0) override;
+
+  virtual bool HandleSDLEvent(const SDL_Event* ev);
 
   SDL_Window* GetSDLWindow() const { return m_window; }
 
   bool IsFullscreen() const;
   void SetFullscreen(bool enable);
-
-  virtual bool HandleSDLEvent(const SDL_Event* ev);
 
 protected:
   virtual u32 GetAdditionalWindowCreateFlags() { return 0; }

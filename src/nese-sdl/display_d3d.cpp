@@ -1,5 +1,5 @@
-#ifdef WIN32
 #include "display_d3d.h"
+#ifdef Y_PLATFORM_WINDOWS
 #include "YBaseLib/Assert.h"
 #include <SDL_syswm.h>
 #include <algorithm>
@@ -54,15 +54,6 @@ DisplayD3D::~DisplayD3D()
 {
   if (m_framebuffer_texture_mapped)
     m_context->Unmap(m_framebuffer_texture.Get(), 0);
-}
-
-std::unique_ptr<DisplayD3D> DisplayD3D::Create()
-{
-  std::unique_ptr<DisplayD3D> display = std::make_unique<DisplayD3D>();
-  if (!display->Initialize())
-    display.reset();
-
-  return display;
 }
 
 bool DisplayD3D::Initialize()

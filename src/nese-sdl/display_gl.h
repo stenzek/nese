@@ -12,8 +12,6 @@ public:
   DisplayGL();
   ~DisplayGL();
 
-  static std::unique_ptr<DisplayGL> Create();
-
   void ResizeFramebuffer(uint32 width, uint32 height) override;
   void DisplayFramebuffer() override;
 

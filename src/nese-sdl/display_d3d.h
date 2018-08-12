@@ -1,8 +1,8 @@
 #pragma once
-
-#ifdef WIN32
-
 #include "YBaseLib/Common.h"
+
+#ifdef Y_PLATFORM_WINDOWS
+
 #include "YBaseLib/Windows/WindowsHeaders.h"
 #include "display.h"
 #include <d3d11.h>
@@ -15,8 +15,6 @@ class DisplayD3D final : public Display
 public:
   DisplayD3D();
   ~DisplayD3D();
-
-  static std::unique_ptr<DisplayD3D> Create();
 
   void ResizeFramebuffer(u32 width, u32 height) override;
   void DisplayFramebuffer() override;
