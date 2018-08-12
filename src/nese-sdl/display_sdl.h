@@ -15,7 +15,6 @@ public:
   ~DisplaySDL();
 
   virtual void ResizeDisplay(u32 width = 0, u32 height = 0) override;
-  virtual void ResizeFramebuffer(u32 width, u32 height) override;
 
   SDL_Window* GetSDLWindow() const { return m_window; }
 
@@ -30,8 +29,6 @@ protected:
   virtual void OnWindowResized();
 
   SDL_Window* m_window = nullptr;
-
-  std::vector<u32> m_framebuffer_data;
 };
 
 } // namespace SDLFrontend

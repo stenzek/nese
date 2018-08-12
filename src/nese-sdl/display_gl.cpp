@@ -6,7 +6,8 @@
 
 #pragma comment(lib, "opengl32.lib")
 
-DisplayGL::DisplayGL() {}
+namespace SDLFrontend {
+DisplayGL::DisplayGL() = default;
 
 DisplayGL::~DisplayGL()
 {
@@ -18,116 +19,98 @@ DisplayGL::~DisplayGL()
     SDL_GL_MakeCurrent(nullptr, nullptr);
     SDL_GL_DeleteContext(m_gl_context);
   }
-
-  if (m_window)
-    SDL_DestroyWindow(m_window);
 }
 
-std::unique_ptr<Display> DisplayGL::Create()
+std::unique_ptr<DisplayGL> DisplayGL::Create()
 {
-  DisplayGL* display = new DisplayGL();
+  std::unique_ptr<DisplayGL> display = std::make_unique<DisplayGL>();
+  if (!display->Initialize())
+    display.reset();
 
-  display->m_window =
-    SDL_CreateWindow("Slightly-faster but still deprecated GL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                     static_cast<int>(display->m_display_width), static_cast<int>(display->m_display_height),
-                     SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+  return display;
+}
 
-  if (!display->m_window)
-    return nullptr;
+bool DisplayGL::Initialize()
+{
+  if (!DisplaySDL::Initialize())
+    return false;
 
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  display->m_gl_context = SDL_GL_CreateContext(display->m_window);
-  if (!display->m_gl_context)
+  m_gl_context = SDL_GL_CreateContext(m_window);
+  if (!m_gl_context)
+  {
+    Panic("Failed to create GL context");
     return nullptr;
+  }
 
-  SDL_GL_MakeCurrent(display->m_window, display->m_gl_context);
+  SDL_GL_MakeCurrent(m_window, m_gl_context);
 
-  uint32 width = display->m_framebuffer_width;
-  uint32 height = display->m_framebuffer_height;
-  display->m_framebuffer_width = 0;
-  display->m_framebuffer_height = 0;
-  display->ResizeFramebuffer(width, height);
-  display->DisplayFramebuffer();
-
-  // glFinish();
-  // SDL_GL_MakeCurrent(nullptr, nullptr);
   // SDL_GL_SetSwapInterval(0);
 
-  return std::unique_ptr<Display>(display);
+  ResizeFramebuffer(m_framebuffer_width, m_framebuffer_height);
+  return true;
 }
 
-void DisplayGL::ResizeDisplay(uint32 width /*= 0*/, uint32 height /*= 0*/)
+u32 DisplayGL::GetAdditionalWindowCreateFlags()
 {
-  Display::ResizeDisplay(width, height);
-
-  // Don't do anything when it's maximized or fullscreen
-  if (SDL_GetWindowFlags(m_window) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN))
-    return;
-
-  SDL_SetWindowSize(m_window, static_cast<int>(m_display_width), static_cast<int>(m_display_height));
+  return SDL_WINDOW_OPENGL;
 }
 
 void DisplayGL::ResizeFramebuffer(uint32 width, uint32 height)
 {
-  if (m_framebuffer_width == width && m_framebuffer_height == height)
+  if (m_framebuffer_texture != 0 && m_framebuffer_width == width && m_framebuffer_height == height)
     return;
 
+  // Update buffer.
+  m_framebuffer_width = width;
+  m_framebuffer_height = height;
+  m_framebuffer_data = std::vector<u32>(width * height);
+  m_framebuffer_pointer = reinterpret_cast<byte*>(m_framebuffer_data.data());
+  m_framebuffer_pitch = sizeof(u32) * width;
+
+  // Update GL texture.
   if (m_framebuffer_texture == 0)
     glGenTextures(1, &m_framebuffer_texture);
 
   glBindTexture(GL_TEXTURE_2D, m_framebuffer_texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_framebuffer_data.data());
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  uint32 pitch = sizeof(byte) * 4 * width;
-  std::unique_ptr<byte[]> buffer = std::make_unique<byte[]>(pitch * height);
-
-  // Copy as much as possible in
-  if (m_framebuffer_pointer)
-  {
-    uint32 copy_width = std::min(m_framebuffer_width, width);
-    uint32 copy_height = std::min(m_framebuffer_height, height);
-    Y_memzero(buffer.get(), pitch * height);
-    Y_memcpy_stride(buffer.get(), pitch, m_framebuffer_pointer, m_framebuffer_pitch, copy_width * 4, copy_height);
-  }
-
-  m_framebuffer_width = width;
-  m_framebuffer_height = height;
-  m_framebuffer_pitch = pitch;
-  m_framebuffer_texture_buffer = std::move(buffer);
-  m_framebuffer_pointer = m_framebuffer_texture_buffer.get();
 }
 
 void DisplayGL::DisplayFramebuffer()
 {
   AddFrameRendered();
 
-  int window_width, window_height;
-  // SDL_GetWindowSize(m_window, &window_width, &window_height);
-  SDL_GL_GetDrawableSize(m_window, &window_width, &window_height);
-
-  float display_ratio = float(m_display_width) / float(m_display_height);
+  // Calculate render rectangle based on aspect ratio.
+  int window_width = int(m_display_width);
+  int window_height = std::max(1, int(m_display_height));
+  float display_ratio = float(m_display_aspect_numerator) / float(m_display_aspect_denominator);
   float window_ratio = float(window_width) / float(window_height);
   int viewport_width = 1;
   int viewport_height = 1;
   if (window_ratio >= display_ratio)
   {
     viewport_width = int(float(window_height) * display_ratio);
-    viewport_height = window_height;
+    viewport_height = int(window_height);
   }
   else
   {
-    viewport_width = window_width;
+    viewport_width = int(window_width);
     viewport_height = int(float(window_width) / display_ratio);
   }
 
   int viewport_x = (window_width - viewport_width) / 2;
   int viewport_y = (window_height - viewport_height) / 2;
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -135,13 +118,10 @@ void DisplayGL::DisplayFramebuffer()
   glLoadIdentity();
   glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
 
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, m_framebuffer_texture);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_framebuffer_width, m_framebuffer_height, GL_RGBA, GL_UNSIGNED_BYTE,
-                  m_framebuffer_pointer);
+                  m_framebuffer_data.data());
 
   glBegin(GL_QUADS);
   glTexCoord2f(0.0f, 0.0f);
@@ -156,3 +136,5 @@ void DisplayGL::DisplayFramebuffer()
 
   SDL_GL_SwapWindow(m_window);
 }
+
+} // namespace SDLFrontend

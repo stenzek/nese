@@ -31,18 +31,6 @@ void DisplaySDL::ResizeDisplay(uint32 width /*= 0*/, uint32 height /*= 0*/)
   // return;
 }
 
-void DisplaySDL::ResizeFramebuffer(uint32 width, uint32 height)
-{
-  if (m_framebuffer_width != width || m_framebuffer_height != height)
-  {
-    m_framebuffer_width = width;
-    m_framebuffer_height = height;
-    m_framebuffer_data.resize(m_framebuffer_width * m_framebuffer_height);
-    m_framebuffer_pointer = reinterpret_cast<u8*>(m_framebuffer_data.data());
-    m_framebuffer_pitch = width * sizeof(u32);
-  }
-}
-
 bool DisplaySDL::IsFullscreen() const
 {
   return ((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) != 0);

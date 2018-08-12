@@ -1,27 +1,30 @@
 #pragma once
 
-#include "common/display.h"
+#include "display_sdl.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <memory>
+#include <vector>
 
-class DisplayGL : public Display
+namespace SDLFrontend {
+class DisplayGL : public DisplaySDL
 {
 public:
   DisplayGL();
   ~DisplayGL();
 
-  static std::unique_ptr<Display> Create();
+  static std::unique_ptr<DisplayGL> Create();
 
-  SDL_Window* GetSDLWindow() const { return m_window; }
-
-  void ResizeDisplay(uint32 width = 0, uint32 height = 0) override;
   void ResizeFramebuffer(uint32 width, uint32 height) override;
   void DisplayFramebuffer() override;
 
+protected:
+  virtual u32 GetAdditionalWindowCreateFlags() override;
+
 private:
-  SDL_Window* m_window = nullptr;
+  bool Initialize() override;
+
   SDL_GLContext m_gl_context = nullptr;
   GLuint m_framebuffer_texture = 0;
-  std::unique_ptr<byte[]> m_framebuffer_texture_buffer;
+  std::vector<u32> m_framebuffer_data;
 };
+} // namespace SDLFrontend

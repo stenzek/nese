@@ -4,6 +4,7 @@
 #include "YBaseLib/Log.h"
 #include "audio.h"
 #include "nese-sdl/display_d3d.h"
+#include "nese-sdl/display_gl.h"
 #include "nese/cartridge.h"
 #include "nese/controller.h"
 #include "nese/system.h"
@@ -57,7 +58,8 @@ int main(int argc, char* argv[])
   }
 
   std::unique_ptr<SDLFrontend::Audio> audio = std::make_unique<SDLFrontend::Audio>();
-  std::unique_ptr<SDLFrontend::DisplayD3D> display = SDLFrontend::DisplayD3D::Create();
+  // std::unique_ptr<SDLFrontend::DisplayD3D> display = SDLFrontend::DisplayD3D::Create();
+  std::unique_ptr<SDLFrontend::DisplayGL> display = SDLFrontend::DisplayGL::Create();
   if (!display)
     return EXIT_FAILURE;
 
