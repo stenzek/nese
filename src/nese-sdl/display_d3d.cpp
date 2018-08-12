@@ -223,26 +223,12 @@ void DisplayD3D::DisplayFramebuffer()
     m_framebuffer_texture_mapped = false;
   }
 
-  // Calculate render rectangle based on aspect ratio.
-  int window_width = int(m_display_width);
-  int window_height = std::max(1, int(m_display_height));
-  float display_ratio = float(m_display_aspect_numerator) / float(m_display_aspect_denominator);
-  float window_ratio = float(window_width) / float(window_height);
-  int viewport_width = 1;
-  int viewport_height = 1;
-  if (window_ratio >= display_ratio)
-  {
-    viewport_width = int(float(window_height) * display_ratio);
-    viewport_height = int(window_height);
-  }
-  else
-  {
-    viewport_width = int(window_width);
-    viewport_height = int(float(window_width) / display_ratio);
-  }
+  s32 viewport_x, viewport_y;
+  u32 viewport_width, viewport_height;
+  CalculateDrawRectangle(&viewport_x, &viewport_y, &viewport_width, &viewport_height);
 
-  int viewport_x = (window_width - viewport_width) / 2;
-  int viewport_y = (window_height - viewport_height) / 2;
+  // Handle GL bottom-left origin.
+  viewport_y = s32(m_display_height) - viewport_y - s32(viewport_height);
 
   static const float clear_color[] = {0.0f, 0.0f, 0.0f, 1.0f};
   m_context->ClearRenderTargetView(m_swap_chain_rtv.Get(), clear_color);
