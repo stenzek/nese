@@ -1,12 +1,12 @@
 #pragma once
 
-#include "display_sdl.h"
+#include "display.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <vector>
 
 namespace SDLFrontend {
-class DisplayGL : public DisplaySDL
+class DisplayGL : public Display
 {
 public:
   DisplayGL();

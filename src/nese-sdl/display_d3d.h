@@ -4,13 +4,13 @@
 
 #include "YBaseLib/Common.h"
 #include "YBaseLib/Windows/WindowsHeaders.h"
-#include "display_sdl.h"
+#include "display.h"
 #include <d3d11.h>
 #include <memory>
 #include <wrl.h>
 
 namespace SDLFrontend {
-class DisplayD3D final : public DisplaySDL
+class DisplayD3D final : public Display
 {
 public:
   DisplayD3D();

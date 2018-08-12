@@ -67,7 +67,7 @@ std::unique_ptr<DisplayD3D> DisplayD3D::Create()
 
 bool DisplayD3D::Initialize()
 {
-  if (!DisplaySDL::Initialize())
+  if (!Display::Initialize())
     return false;
 
   SDL_SysWMinfo info = {};
@@ -273,7 +273,7 @@ void DisplayD3D::DisplayFramebuffer()
 
 void DisplayD3D::OnWindowResized()
 {
-  DisplaySDL::OnWindowResized();
+  Display::OnWindowResized();
 
   m_context->OMSetRenderTargets(0, nullptr, nullptr);
   m_swap_chain_rtv.Reset();

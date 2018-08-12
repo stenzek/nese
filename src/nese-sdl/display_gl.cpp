@@ -32,7 +32,7 @@ std::unique_ptr<DisplayGL> DisplayGL::Create()
 
 bool DisplayGL::Initialize()
 {
-  if (!DisplaySDL::Initialize())
+  if (!Display::Initialize())
     return false;
 
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
