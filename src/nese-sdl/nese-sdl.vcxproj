@@ -11,32 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apu.h" />
-    <ClInclude Include="bus.h" />
-    <ClInclude Include="cartridge.h" />
-    <ClInclude Include="controller.h" />
-    <ClInclude Include="cpu.h" />
-    <ClInclude Include="cpu_instruction_list.h" />
-    <ClInclude Include="mappers\gxrom.h" />
-    <ClInclude Include="mappers\mmc1.h" />
-    <ClInclude Include="mappers\uxrom.h" />
-    <ClInclude Include="ppu.h" />
-    <ClInclude Include="system.h" />
-    <ClInclude Include="types.h" />
+    <ClInclude Include="display_d3d.h" />
+    <ClInclude Include="display_gl.h" />
+    <ClInclude Include="display_sdl.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="apu.cpp" />
-    <ClCompile Include="bus.cpp" />
-    <ClCompile Include="cartridge.cpp" />
-    <ClCompile Include="controller.cpp" />
-    <ClCompile Include="cpu.cpp" />
-    <ClCompile Include="cpu_disasm.cpp" />
-    <ClCompile Include="cpu_instr.cpp" />
-    <ClCompile Include="mappers\gxrom.cpp" />
-    <ClCompile Include="mappers\mmc1.cpp" />
-    <ClCompile Include="mappers\uxrom.cpp" />
-    <ClCompile Include="ppu.cpp" />
-    <ClCompile Include="system.cpp" />
+    <ClCompile Include="display_d3d.cpp" />
+    <ClCompile Include="display_gl.cpp" />
+    <ClCompile Include="display_sdl.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\dep\Nes_Snd_Emu\Nes_Snd_Emu.vcxproj">
@@ -48,22 +31,25 @@
     <ProjectReference Include="..\common\common.vcxproj">
       <Project>{0d2c8dba-3b04-4b19-b69f-f878a7a16225}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\nese\nese.vcxproj">
+      <Project>{1f82d955-f840-4599-99b9-e94559ef6169}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1F82D955-F840-4599-99B9-E94559EF6169}</ProjectGuid>
+    <ProjectGuid>{76A749B2-936A-4557-9685-530BEE0FF45A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>nese</RootNamespace>
+    <RootNamespace>nese-sdl</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -100,8 +86,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\msvc\include\SDL;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -120,8 +105,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\msvc\include;$(SolutionDir)dep\msvc\include\SDL;$(SolutionDir)dep\YBaseLib\Include;$(SolutionDir)dep\Nes_Snd_Emu;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

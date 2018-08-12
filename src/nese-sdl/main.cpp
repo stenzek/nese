@@ -3,9 +3,9 @@
 #include "YBaseLib/Error.h"
 #include "YBaseLib/Log.h"
 #include "common/audio.h"
+#include "nese-sdl/display_d3d.h"
 #include "nese/cartridge.h"
 #include "nese/controller.h"
-#include "nese/display_d3d.h"
 #include "nese/system.h"
 #include <SDL/SDL.h>
 #include <cstdio>

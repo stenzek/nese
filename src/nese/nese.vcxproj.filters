@@ -7,9 +7,6 @@
     <ClInclude Include="controller.h" />
     <ClInclude Include="cpu.h" />
     <ClInclude Include="cpu_instruction_list.h" />
-    <ClInclude Include="display_d3d.h" />
-    <ClInclude Include="display_gl.h" />
-    <ClInclude Include="display_sdl.h" />
     <ClInclude Include="ppu.h" />
     <ClInclude Include="system.h" />
     <ClInclude Include="types.h" />
@@ -31,10 +28,6 @@
     <ClCompile Include="cpu.cpp" />
     <ClCompile Include="cpu_disasm.cpp" />
     <ClCompile Include="cpu_instr.cpp" />
-    <ClCompile Include="display_d3d.cpp" />
-    <ClCompile Include="display_gl.cpp" />
-    <ClCompile Include="display_sdl.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="ppu.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="mappers\mmc1.cpp">

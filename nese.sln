@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "src\common\common
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{077916A4-0004-4D1F-889D-34C90D736E63}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nese-sdl", "src\nese-sdl\nese-sdl.vcxproj", "{76A749B2-936A-4557-9685-530BEE0FF45A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -65,6 +67,16 @@ Global
 		{0D2C8DBA-3B04-4B19-B69F-F878A7A16225}.Release|Win32.ActiveCfg = Release|Win32
 		{0D2C8DBA-3B04-4B19-B69F-F878A7A16225}.Release|Win32.Build.0 = Release|Win32
 		{0D2C8DBA-3B04-4B19-B69F-F878A7A16225}.Release|x64.ActiveCfg = Release|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.Debug|Win32.Build.0 = Debug|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.Debug|x64.ActiveCfg = Debug|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.DebugFast|Win32.ActiveCfg = Debug|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.DebugFast|Win32.Build.0 = Debug|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.DebugFast|x64.ActiveCfg = Release|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.DebugFast|x64.Build.0 = Release|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.Release|Win32.ActiveCfg = Release|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.Release|Win32.Build.0 = Release|Win32
+		{76A749B2-936A-4557-9685-530BEE0FF45A}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
