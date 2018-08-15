@@ -20,8 +20,8 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_QtFrontend__MainWindow_t
 {
-  QByteArrayData data[27];
-  char stringdata0[475];
+  QByteArrayData data[28];
+  char stringdata0[505];
 };
 #define QT_MOC_LITERAL(idx, ofs, len)                                                                                  \
   Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(                                                             \
@@ -46,16 +46,17 @@ static const qt_meta_stringdata_QtFrontend__MainWindow_t qt_meta_stringdata_QtFr
     QT_MOC_LITERAL(14, 245, 20), // "onPowerActionToggled"
     QT_MOC_LITERAL(15, 266, 8),  // "selected"
     QT_MOC_LITERAL(16, 275, 22), // "onResetActionTriggered"
-    QT_MOC_LITERAL(17, 298, 22), // "onAboutActionTriggered"
-    QT_MOC_LITERAL(18, 321, 25), // "onDisplayWindowKeyPressed"
-    QT_MOC_LITERAL(19, 347, 10), // "QKeyEvent*"
-    QT_MOC_LITERAL(20, 358, 5),  // "event"
-    QT_MOC_LITERAL(21, 364, 26), // "onDisplayWindowKeyReleased"
-    QT_MOC_LITERAL(22, 391, 16), // "onEmulationError"
-    QT_MOC_LITERAL(23, 408, 10), // "error_text"
-    QT_MOC_LITERAL(24, 419, 18), // "onEmulationStarted"
-    QT_MOC_LITERAL(25, 438, 17), // "onEmulationPaused"
-    QT_MOC_LITERAL(26, 456, 18)  // "onEmulationStopped"
+    QT_MOC_LITERAL(17, 298, 29), // "onEnableDebuggerActionToggled"
+    QT_MOC_LITERAL(18, 328, 22), // "onAboutActionTriggered"
+    QT_MOC_LITERAL(19, 351, 25), // "onDisplayWindowKeyPressed"
+    QT_MOC_LITERAL(20, 377, 10), // "QKeyEvent*"
+    QT_MOC_LITERAL(21, 388, 5),  // "event"
+    QT_MOC_LITERAL(22, 394, 26), // "onDisplayWindowKeyReleased"
+    QT_MOC_LITERAL(23, 421, 16), // "onEmulationError"
+    QT_MOC_LITERAL(24, 438, 10), // "error_text"
+    QT_MOC_LITERAL(25, 449, 18), // "onEmulationStarted"
+    QT_MOC_LITERAL(26, 468, 17), // "onEmulationPaused"
+    QT_MOC_LITERAL(27, 486, 18)  // "onEmulationStopped"
 
   },
   "QtFrontend::MainWindow\0queueStartEmulation\0"
@@ -65,9 +66,10 @@ static const qt_meta_stringdata_QtFrontend__MainWindow_t qt_meta_stringdata_QtFr
   "queueStopEmulationRequest\0queueSingleStep\0"
   "queueFrameStep\0onLoadCartridgeActionTriggered\0"
   "onPowerActionToggled\0selected\0"
-  "onResetActionTriggered\0onAboutActionTriggered\0"
-  "onDisplayWindowKeyPressed\0QKeyEvent*\0"
-  "event\0onDisplayWindowKeyReleased\0"
+  "onResetActionTriggered\0"
+  "onEnableDebuggerActionToggled\0"
+  "onAboutActionTriggered\0onDisplayWindowKeyPressed\0"
+  "QKeyEvent*\0event\0onDisplayWindowKeyReleased\0"
   "onEmulationError\0error_text\0"
   "onEmulationStarted\0onEmulationPaused\0"
   "onEmulationStopped"};
@@ -79,7 +81,7 @@ static const uint qt_meta_data_QtFrontend__MainWindow[] = {
   7,      // revision
   0,      // classname
   0, 0,   // classinfo
-  16, 14, // methods
+  17, 14, // methods
   0, 0,   // properties
   0, 0,   // enums/sets
   0, 0,   // constructors
@@ -87,23 +89,23 @@ static const uint qt_meta_data_QtFrontend__MainWindow[] = {
   6,      // signalCount
 
   // signals: name, argc, parameters, tag, flags
-  1, 1, 94, 2, 0x06 /* Public */, 4, 3, 97, 2, 0x06 /* Public */, 8, 1, 104, 2, 0x06 /* Public */, 10, 0, 107, 2,
-  0x06 /* Public */, 11, 0, 108, 2, 0x06 /* Public */, 12, 0, 109, 2, 0x06 /* Public */,
+  1, 1, 99, 2, 0x06 /* Public */, 4, 3, 102, 2, 0x06 /* Public */, 8, 1, 109, 2, 0x06 /* Public */, 10, 0, 112, 2,
+  0x06 /* Public */, 11, 0, 113, 2, 0x06 /* Public */, 12, 0, 114, 2, 0x06 /* Public */,
 
   // slots: name, argc, parameters, tag, flags
-  13, 0, 110, 2, 0x0a /* Public */, 14, 1, 111, 2, 0x0a /* Public */, 16, 0, 114, 2, 0x0a /* Public */, 17, 0, 115, 2,
-  0x0a /* Public */, 18, 1, 116, 2, 0x0a /* Public */, 21, 1, 119, 2, 0x0a /* Public */, 22, 1, 122, 2,
-  0x0a /* Public */, 24, 0, 125, 2, 0x0a /* Public */, 25, 1, 126, 2, 0x0a /* Public */, 26, 0, 129, 2,
-  0x0a /* Public */,
+  13, 0, 115, 2, 0x0a /* Public */, 14, 1, 116, 2, 0x0a /* Public */, 16, 0, 119, 2, 0x0a /* Public */, 17, 1, 120, 2,
+  0x0a /* Public */, 18, 0, 123, 2, 0x0a /* Public */, 19, 1, 124, 2, 0x0a /* Public */, 22, 1, 127, 2,
+  0x0a /* Public */, 23, 1, 130, 2, 0x0a /* Public */, 25, 0, 133, 2, 0x0a /* Public */, 26, 1, 134, 2,
+  0x0a /* Public */, 27, 0, 137, 2, 0x0a /* Public */,
 
   // signals: parameters
   QMetaType::Void, QMetaType::QString, 3, QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Bool, 5, 6, 7,
   QMetaType::Void, QMetaType::Bool, 9, QMetaType::Void, QMetaType::Void, QMetaType::Void,
 
   // slots: parameters
-  QMetaType::Void, QMetaType::Void, QMetaType::Bool, 15, QMetaType::Void, QMetaType::Void, QMetaType::Void,
-  0x80000000 | 19, 20, QMetaType::Void, 0x80000000 | 19, 20, QMetaType::Void, QMetaType::QString, 23, QMetaType::Void,
-  QMetaType::Void, QMetaType::Bool, 9, QMetaType::Void,
+  QMetaType::Void, QMetaType::Void, QMetaType::Bool, 15, QMetaType::Void, QMetaType::Void, QMetaType::Bool, 15,
+  QMetaType::Void, QMetaType::Void, 0x80000000 | 20, 21, QMetaType::Void, 0x80000000 | 20, 21, QMetaType::Void,
+  QMetaType::QString, 24, QMetaType::Void, QMetaType::Void, QMetaType::Bool, 9, QMetaType::Void,
 
   0 // eod
 };
@@ -146,24 +148,27 @@ void QtFrontend::MainWindow::qt_static_metacall(QObject* _o, QMetaObject::Call _
         _t->onResetActionTriggered();
         break;
       case 9:
-        _t->onAboutActionTriggered();
+        _t->onEnableDebuggerActionToggled((*reinterpret_cast<bool(*)>(_a[1])));
         break;
       case 10:
-        _t->onDisplayWindowKeyPressed((*reinterpret_cast<QKeyEvent*(*)>(_a[1])));
+        _t->onAboutActionTriggered();
         break;
       case 11:
-        _t->onDisplayWindowKeyReleased((*reinterpret_cast<QKeyEvent*(*)>(_a[1])));
+        _t->onDisplayWindowKeyPressed((*reinterpret_cast<QKeyEvent*(*)>(_a[1])));
         break;
       case 12:
-        _t->onEmulationError((*reinterpret_cast<QString(*)>(_a[1])));
+        _t->onDisplayWindowKeyReleased((*reinterpret_cast<QKeyEvent*(*)>(_a[1])));
         break;
       case 13:
-        _t->onEmulationStarted();
+        _t->onEmulationError((*reinterpret_cast<QString(*)>(_a[1])));
         break;
       case 14:
-        _t->onEmulationPaused((*reinterpret_cast<bool(*)>(_a[1])));
+        _t->onEmulationStarted();
         break;
       case 15:
+        _t->onEmulationPaused((*reinterpret_cast<bool(*)>(_a[1])));
+        break;
+      case 16:
         _t->onEmulationStopped();
         break;
       default:;
@@ -249,15 +254,15 @@ int QtFrontend::MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void** _a
     return _id;
   if (_c == QMetaObject::InvokeMetaMethod)
   {
-    if (_id < 16)
+    if (_id < 17)
       qt_static_metacall(this, _c, _id, _a);
-    _id -= 16;
+    _id -= 17;
   }
   else if (_c == QMetaObject::RegisterMethodArgumentMetaType)
   {
-    if (_id < 16)
+    if (_id < 17)
       *reinterpret_cast<int*>(_a[0]) = -1;
-    _id -= 16;
+    _id -= 17;
   }
   return _id;
 }

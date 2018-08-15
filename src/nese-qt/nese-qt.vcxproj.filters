@@ -10,6 +10,9 @@
     <ClCompile Include="moc_emuthread.cpp" />
     <ClCompile Include="displaywindow.cpp" />
     <ClCompile Include="moc_displaywindow.cpp" />
+    <ClCompile Include="debuggerwindow.cpp" />
+    <ClCompile Include="debuggermodels.cpp" />
+    <ClCompile Include="moc_debuggerwindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mainwindow.h" />
@@ -17,6 +20,9 @@
     <ClInclude Include="audio.h" />
     <ClInclude Include="emuthread.h" />
     <ClInclude Include="displaywindow.h" />
+    <ClInclude Include="debuggermodels.h" />
+    <ClInclude Include="debuggerwindow.h" />
+    <ClInclude Include="ui_debuggerwindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mainwindow.ui" />

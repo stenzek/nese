@@ -19,6 +19,7 @@
     <ClInclude Include="mappers\uxrom.h">
       <Filter>mappers</Filter>
     </ClInclude>
+    <ClInclude Include="cpu_debug_interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="apu.cpp" />

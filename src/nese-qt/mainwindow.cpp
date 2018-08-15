@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "YBaseLib/ByteStream.h"
 #include "audio.h"
+#include "debuggerwindow.h"
 #include "displaywindow.h"
 #include "emuthread.h"
 #include "nese/controller.h"
@@ -69,6 +70,27 @@ void MainWindow::onLoadCartridgeActionTriggered()
 void MainWindow::onPowerActionToggled(bool selected) {}
 
 void MainWindow::onResetActionTriggered() {}
+
+void MainWindow::onEnableDebuggerActionToggled(bool selected)
+{
+  // TODO: Ensure the system is paused.
+  if (selected)
+  {
+    if (m_debugger_window)
+      return;
+
+    m_debugger_window = new DebuggerWindow(nullptr, this);
+    m_debugger_window->show();
+  }
+  else
+  {
+    if (!m_debugger_window)
+      return;
+
+    m_debugger_window->deleteLater();
+    m_debugger_window = nullptr;
+  }
+}
 
 void MainWindow::onAboutActionTriggered()
 {
@@ -193,6 +215,7 @@ void MainWindow::connectSignals()
 {
   connect(m_ui->actionLoadCartridge, SIGNAL(triggered()), this, SLOT(onLoadCartridgeActionTriggered()));
   connect(m_ui->actionPower, SIGNAL(triggered(bool)), this, SLOT(onPowerActionToggled(bool)));
+  connect(m_ui->actionEnableDebugger, SIGNAL(triggered(bool)), SLOT(onEnableDebuggerActionToggled(bool)));
   connect(m_ui->action_About, SIGNAL(triggered()), this, SLOT(onAboutActionTriggered()));
 
   connect(m_display_window, SIGNAL(keyPressed(QKeyEvent*)), this, SLOT(onDisplayWindowKeyPressed(QKeyEvent*)));

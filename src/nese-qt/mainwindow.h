@@ -10,6 +10,7 @@
 namespace QtFrontend {
 
 class Audio;
+class DebuggerWindow;
 class DisplayWindow;
 class EmuThread;
 
@@ -27,6 +28,7 @@ public Q_SLOTS:
   void onLoadCartridgeActionTriggered();
   void onPowerActionToggled(bool selected);
   void onResetActionTriggered();
+  void onEnableDebuggerActionToggled(bool selected);
   void onAboutActionTriggered();
 
   void onDisplayWindowKeyPressed(QKeyEvent* event);
@@ -61,5 +63,7 @@ private:
   std::unique_ptr<Audio> m_audio;
 
   EmuThread* m_emu_thread = nullptr;
+
+  DebuggerWindow* m_debugger_window = nullptr;
 };
 } // namespace QtFrontend

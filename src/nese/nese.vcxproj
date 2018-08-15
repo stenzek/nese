@@ -32,6 +32,7 @@
     <ClInclude Include="cartridge.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cpu.h" />
+    <ClInclude Include="cpu_debug_interface.h" />
     <ClInclude Include="cpu_instruction_list.h" />
     <ClInclude Include="mappers\gxrom.h" />
     <ClInclude Include="mappers\mmc1.h" />
