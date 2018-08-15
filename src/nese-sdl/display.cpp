@@ -79,26 +79,4 @@ void Display::OnWindowResized()
   m_display_height = height;
 }
 
-void Display::CalculateDrawRectangle(s32* x, s32* y, u32* width, u32* height)
-{
-  // Calculate render rectangle based on aspect ratio.
-  int window_width = int(m_display_width);
-  int window_height = std::max(1, int(m_display_height));
-  float display_ratio = float(m_display_aspect_numerator) / float(m_display_aspect_denominator);
-  float window_ratio = float(window_width) / float(window_height);
-  if (window_ratio >= display_ratio)
-  {
-    *width = u32(float(window_height) * display_ratio);
-    *height = u32(window_height);
-  }
-  else
-  {
-    *width = u32(window_width);
-    *height = u32(float(window_width) / display_ratio);
-  }
-
-  *x = (window_width - s32(*width)) / 2;
-  *y = (window_height - s32(*height)) / 2;
-}
-
 } // namespace SDLFrontend

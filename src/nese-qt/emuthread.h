@@ -3,7 +3,7 @@
 #include <QtCore/QThread>
 #include <memory>
 
-class Error;
+class QKeyEvent;
 
 class Cartridge;
 class StandardController;
@@ -11,26 +11,25 @@ class System;
 
 namespace QtFrontend {
 
-class DisplayWidget;
+class Audio;
+class DisplayWindow;
 
-class EmuThread : public QThread
+class EmuThread final : public QThread
 {
   Q_OBJECT
 
 public:
-  EmuThread(DisplayWidget* display_widget);
+  EmuThread(DisplayWindow* display_widget, Audio* audio, QThread* owner_thread);
   ~EmuThread();
 
 Q_SIGNALS:
-  void emulationErrorEvent(Error* error);
+  void emulationErrorEvent(QString error_text);
   void emulationStartedEvent();
   void emulationPausedEvent(bool paused);
   void emulationStoppedEvent();
 
 public Q_SLOTS:
-  void onStartEmulation(const QString cartridge_filename);
-
-  void onControllerButtonPressed(u32 controller, u32 button_index);
+  void onStartEmulation(QString cartridge_filename);
 
   void onEmulationPauseRequest(bool paused);
   void onEmulationStopRequest();
@@ -38,8 +37,17 @@ public Q_SLOTS:
   void onSingleStep();
   void onFrameStep();
 
+  void onSetControllerButtonState(int controller, int button, bool state);
+
+protected:
+  void run() override;
+
 private:
-  DisplayWidget* m_display_widget;
+  void Stop();
+
+  DisplayWindow* m_display_window;
+  Audio* m_audio;
+  QThread* m_owner_thread;
 
   std::unique_ptr<StandardController> m_controller_1;
   std::unique_ptr<Cartridge> m_cartridge;

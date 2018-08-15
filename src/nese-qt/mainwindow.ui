@@ -27,13 +27,15 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_System">
     <property name="title">
      <string>&amp;System</string>
     </property>
+    <addaction name="actionLoadCartridge"/>
+    <addaction name="separator"/>
     <addaction name="actionEnableDebugger"/>
     <addaction name="separator"/>
     <addaction name="actionPower"/>
@@ -63,8 +65,6 @@
     <property name="title">
      <string>&amp;Devices</string>
     </property>
-    <addaction name="actionChange_Floppy_A"/>
-    <addaction name="actionChange_Floppy_B"/>
    </widget>
    <widget class="QMenu" name="menu_Help_2">
     <property name="title">
@@ -72,15 +72,7 @@
     </property>
     <addaction name="action_About"/>
    </widget>
-   <widget class="QMenu" name="menu_Input">
-    <property name="title">
-     <string>&amp;Input</string>
-    </property>
-    <addaction name="actionCapture"/>
-    <addaction name="actionSend_Ctrl_Alt_Delete"/>
-   </widget>
    <addaction name="menu_System"/>
-   <addaction name="menu_Input"/>
    <addaction name="menu_Help"/>
    <addaction name="menu_View"/>
    <addaction name="menu_Help_2"/>
@@ -96,8 +88,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionCapture"/>
-   <addaction name="actionSend_Ctrl_Alt_Delete"/>
+   <addaction name="actionLoadCartridge"/>
    <addaction name="separator"/>
    <addaction name="actionPower"/>
    <addaction name="actionPause"/>
@@ -105,9 +96,6 @@
    <addaction name="separator"/>
    <addaction name="actionLoadState"/>
    <addaction name="actionSaveState"/>
-   <addaction name="separator"/>
-   <addaction name="actionChange_Floppy_A"/>
-   <addaction name="actionChange_Floppy_B"/>
   </widget>
   <action name="action_About">
    <property name="text">
@@ -138,24 +126,6 @@
     <string>&amp;Reset</string>
    </property>
   </action>
-  <action name="actionSend_Ctrl_Alt_Delete">
-   <property name="icon">
-    <iconset resource="resources/icons.qrc">
-     <normaloff>:/icons/emblem-symbolic-link.png</normaloff>:/icons/emblem-symbolic-link.png</iconset>
-   </property>
-   <property name="text">
-    <string>Send Ctrl+Alt+&amp;Del</string>
-   </property>
-  </action>
-  <action name="actionCapture">
-   <property name="icon">
-    <iconset resource="resources/icons.qrc">
-     <normaloff>:/icons/input-mouse.png</normaloff>:/icons/input-mouse.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Capture</string>
-   </property>
-  </action>
   <action name="actionClose">
    <property name="icon">
     <iconset resource="resources/icons.qrc">
@@ -163,24 +133,6 @@
    </property>
    <property name="text">
     <string>&amp;Close</string>
-   </property>
-  </action>
-  <action name="actionChange_Floppy_A">
-   <property name="icon">
-    <iconset resource="resources/icons.qrc">
-     <normaloff>:/icons/media-floppy.png</normaloff>:/icons/media-floppy.png</iconset>
-   </property>
-   <property name="text">
-    <string>Change Floppy &amp;A</string>
-   </property>
-  </action>
-  <action name="actionChange_Floppy_B">
-   <property name="icon">
-    <iconset resource="resources/icons.qrc">
-     <normaloff>:/icons/media-floppy.png</normaloff>:/icons/media-floppy.png</iconset>
-   </property>
-   <property name="text">
-    <string>Change Floppy &amp;B</string>
    </property>
   </action>
   <action name="actionEnableDebugger">
@@ -237,6 +189,15 @@
    </property>
    <property name="text">
     <string>&amp;Save State</string>
+   </property>
+  </action>
+  <action name="actionLoadCartridge">
+   <property name="icon">
+    <iconset resource="resources/icons.qrc">
+     <normaloff>:/icons/media-floppy.png</normaloff>:/icons/media-floppy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load &amp;Cartridge</string>
    </property>
   </action>
  </widget>

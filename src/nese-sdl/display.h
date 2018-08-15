@@ -30,8 +30,6 @@ protected:
   virtual bool Initialize();
   virtual void OnWindowResized();
 
-  void CalculateDrawRectangle(s32* x, s32* y, u32* width, u32* height);
-
   SDL_Window* m_window = nullptr;
 };
 

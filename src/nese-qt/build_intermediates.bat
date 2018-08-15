@@ -1,6 +1,6 @@
 SET PATH=%PATH%;%~dp0\..\..\dep\msvc\qt5-64\bin
 
-moc -o moc_displaywidget.cpp displaywidget.h
+moc -o moc_displaywindow.cpp displaywindow.h
 moc -o moc_emuthread.cpp emuthread.h
 moc -o moc_mainwindow.cpp mainwindow.h
 

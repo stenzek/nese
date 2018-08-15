@@ -37,6 +37,7 @@ public:
 
 protected:
   void AddFrameRendered();
+  void CalculateDrawRectangle(s32* x, s32* y, u32* width, u32* height);
 
   u32 m_framebuffer_width = 640;
   u32 m_framebuffer_height = 480;
