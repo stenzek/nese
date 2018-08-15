@@ -4,6 +4,7 @@
 #include "bus.h"
 #include "mappers/gxrom.h"
 #include "mappers/mmc1.h"
+#include "mappers/nrom.h"
 #include "mappers/uxrom.h"
 
 #pragma pack(push, 1)
@@ -174,6 +175,10 @@ std::unique_ptr<Cartridge> Cartridge::LoadINES(ByteStream* stream, Error* error)
   std::unique_ptr<Cartridge> cart;
   switch (data.mapper_id)
   {
+    case 0:
+      cart = std::make_unique<Mappers::NROM>();
+      break;
+
     case 1:
       cart = std::make_unique<Mappers::MMC1>();
       break;

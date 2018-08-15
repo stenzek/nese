@@ -20,6 +20,9 @@
       <Filter>mappers</Filter>
     </ClInclude>
     <ClInclude Include="cpu_debug_interface.h" />
+    <ClInclude Include="mappers\nrom.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="apu.cpp" />
@@ -38,6 +41,9 @@
       <Filter>mappers</Filter>
     </ClCompile>
     <ClCompile Include="mappers\uxrom.cpp">
+      <Filter>mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="mappers\nrom.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
   </ItemGroup>

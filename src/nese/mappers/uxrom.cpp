@@ -32,9 +32,9 @@ void UxROM::Reset()
 u8 UxROM::ReadCPUAddress(Bus* bus, u16 address)
 {
   if ((address & 0xC000) == 0xC000)
-    return m_prg_rom[m_prg_base_address_8000 | (address & 0x3FFF)];
-  else
     return m_prg_rom[m_prg_base_address_C000 | (address & 0x3FFF)];
+  else
+    return m_prg_rom[m_prg_base_address_8000 | (address & 0x3FFF)];
 }
 
 void UxROM::WriteCPUAddress(Bus* bus, u16 address, u8 value)
