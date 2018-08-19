@@ -204,6 +204,10 @@ std::unique_ptr<Cartridge> Cartridge::LoadINES(ByteStream* stream, Error* error)
       cart = std::make_unique<Mappers::UxROM>();
       break;
 
+    case 4:
+      cart = std::make_unique<Mappers::MMC3>();
+      break;
+
     case 66:
       cart = std::make_unique<Mappers::GxROM>();
       break;

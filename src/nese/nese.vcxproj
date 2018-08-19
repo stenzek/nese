@@ -36,6 +36,7 @@
     <ClInclude Include="cpu_instruction_list.h" />
     <ClInclude Include="mappers\gxrom.h" />
     <ClInclude Include="mappers\mmc1.h" />
+    <ClInclude Include="mappers\mmc3.h" />
     <ClInclude Include="mappers\nrom.h" />
     <ClInclude Include="mappers\uxrom.h" />
     <ClInclude Include="ppu.h" />
@@ -52,6 +53,7 @@
     <ClCompile Include="cpu_instr.cpp" />
     <ClCompile Include="mappers\gxrom.cpp" />
     <ClCompile Include="mappers\mmc1.cpp" />
+    <ClCompile Include="mappers\mmc3.cpp" />
     <ClCompile Include="mappers\nrom.cpp" />
     <ClCompile Include="mappers\uxrom.cpp" />
     <ClCompile Include="ppu.cpp" />
