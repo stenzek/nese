@@ -126,8 +126,6 @@ void MMC1::WritePPUAddress(Bus* bus, u16 address, u8 value)
     const u32 offset = ((address & 0x1000) ? m_base_chr_address_1000 : m_base_chr_address_0000) | (address & 0xFFF);
     if (m_chr_rom.empty())
       m_chr_ram[offset] = value;
-    else
-      m_chr_rom[offset] = value;
   }
 }
 

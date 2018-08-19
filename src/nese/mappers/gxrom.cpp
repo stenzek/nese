@@ -31,8 +31,8 @@ bool GxROM::Initialize(CartridgeData& data, Error* error)
 
 void GxROM::Reset()
 {
-  // TODO: Is this correct?
-  WriteBankSelect(0);
+  m_prg_base_address = 0;
+  m_chr_base_address = 0;
 }
 
 u8 GxROM::ReadCPUAddress(Bus* bus, u16 address)
