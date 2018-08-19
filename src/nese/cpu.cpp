@@ -194,7 +194,7 @@ void CPU::HandleNMI()
   // Log_DevPrintf("NMI");
   m_nmi_pending = false;
   PushWord(m_registers.PC);
-  PushByte(m_registers.S);
+  PushByte(m_registers.P);
   m_registers.PC = MemoryReadWord(0xFFFA);
   m_registers.SetFlagI(true);
   AddCycles(7);
@@ -204,7 +204,7 @@ void CPU::HandleIRQ()
 {
   // Log_DevPrintf("IRQ");
   PushWord(m_registers.PC);
-  PushByte(m_registers.S);
+  PushByte(m_registers.P);
   m_registers.PC = MemoryReadWord(0xFFFE);
   m_registers.SetFlagI(true);
   AddCycles(7);
