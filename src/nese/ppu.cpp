@@ -45,8 +45,8 @@ void PPU::Reset()
   m_current_cycle = 340;
   m_current_scanline = 240;
 
-  Y_memzero(m_paletteData, sizeof(m_paletteData));
-  std::memset(m_oamData, 0xFF, sizeof(m_oamData));
+  Y_memzero(m_palette_ram, sizeof(m_palette_ram));
+  std::memset(m_oam_ram, 0xFF, sizeof(m_oam_ram));
   Y_memzero(&m_regs, sizeof(m_regs));
   m_f = 0;
   m_register = 0;
@@ -57,7 +57,7 @@ void PPU::Reset()
   m_sprite_table_address = 0;
   m_background_table_address = 0;
   m_flagMasterSlave = 0;
-  m_flagGrayscale = 0;
+  m_grayscale_flag = 0;
   m_flagShowLeftBackground = 0;
   m_flagShowLeftSprites = 0;
   m_flagShowBackground = 0;
@@ -136,10 +136,10 @@ u8 PPU::Read(u16 address)
     if ((palette_index & 0x13) == 0x10)
       palette_index &= 0x0F;
 
-    if (m_flagGrayscale)
-      return m_paletteData[palette_index] & 0x30;
+    if (m_grayscale_flag)
+      return m_palette_ram[palette_index] & 0x30;
     else
-      return m_paletteData[palette_index];
+      return m_palette_ram[palette_index];
   }
 
   return m_bus->ReadPPUAddress(address);
@@ -154,7 +154,7 @@ void PPU::Write(u16 address, u8 value)
     if ((palette_index & 0x13) == 0x10)
       palette_index &= 0x0F;
 
-    m_paletteData[palette_index] = value;
+    m_palette_ram[palette_index] = value;
     return;
   }
 
@@ -166,7 +166,7 @@ u8 PPU::ReadPalette(u16 address)
   if (address >= 16 && (address % 4) == 0)
     address -= 16;
 
-  return m_paletteData[address];
+  return m_palette_ram[address];
 }
 
 void PPU::WritePalette(u16 address, u8 value)
@@ -174,7 +174,7 @@ void PPU::WritePalette(u16 address, u8 value)
   if (address >= 16 && (address % 4) == 0)
     address -= 16;
 
-  m_paletteData[address] = value;
+  m_palette_ram[address] = value;
 }
 
 void PPU::WriteControl(u8 value)
@@ -190,7 +190,7 @@ void PPU::WriteControl(u8 value)
 
 void PPU::WriteMask(u8 value)
 {
-  m_flagGrayscale = (value >> 0) & 1;
+  m_grayscale_flag = (value >> 0) & 1;
   m_flagShowLeftBackground = (value >> 1) & 1;
   m_flagShowLeftSprites = (value >> 2) & 1;
   m_flagShowBackground = (value >> 3) & 1;
@@ -221,13 +221,13 @@ void PPU::WriteOAMAddress(u8 value)
 
 u8 PPU::ReadOAMData()
 {
-  return m_oamData[m_oamAddress];
+  return m_oam_ram[m_oamAddress];
 }
 
 void PPU::WriteOAMData(u8 value)
 {
-  DebugAssert(m_oamAddress <= sizeof(m_oamData));
-  m_oamData[m_oamAddress] = value;
+  DebugAssert(m_oamAddress <= sizeof(m_oam_ram));
+  m_oam_ram[m_oamAddress] = value;
   m_oamAddress++;
 }
 
@@ -278,6 +278,7 @@ u8 PPU::ReadData()
   if (address >= 0x3F00)
     data = m_ppu_bus_value;
 
+  // Log_DevPrintf("PPU read %04X %02X %02X", address, data, m_ppu_bus_value);
   return data;
 }
 
@@ -286,6 +287,7 @@ void PPU::WriteData(u8 value)
   if (IsRenderingEnabled() && (m_current_scanline <= 240 || m_current_scanline == 261))
     return;
 
+  // Log_DevPrintf("PPU write %04X %02X", m_regs.v.ppudata_address.GetValue(), value);
   Write(m_regs.v.ppudata_address, value);
   m_regs.v.address += m_vram_increment;
 }
@@ -297,13 +299,13 @@ void PPU::WriteDMA(u8 value)
   // We can optimize this if it's in WRAM.
   if (start_address < 0x2000)
   {
-    std::memcpy(m_oamData, m_bus->GetWRAM() + (start_address & 0x7FF), 256);
+    std::memcpy(m_oam_ram, m_bus->GetWRAM() + (start_address & 0x7FF), 256);
   }
   else
   {
     // Otherwise, we have to do byte reads (in case it's registers, or IO space, etc.)
     for (u32 i = 0; i < 256; i++)
-      m_oamData[i] = m_bus->ReadCPUAddress(start_address + i);
+      m_oam_ram[i] = m_bus->ReadCPUAddress(start_address + i);
   }
 
   m_bus->StallCPU(513);
@@ -452,7 +454,7 @@ void PPU::EvaluateSprite()
 
   // Note: Scanline is one less than the scanline the sprite will be rendered on.
   u8 sprite_index = m_sprite_current_index++;
-  int32 sprite_start_y = m_current_scanline - int32(uint32(m_oamData[sprite_index * 4 + 0]));
+  int32 sprite_start_y = m_current_scanline - int32(uint32(m_oam_ram[sprite_index * 4 + 0]));
   if (sprite_start_y < 0 || sprite_start_y >= m_sprite_height)
   {
     // This sprite is not on this line.
@@ -467,10 +469,10 @@ void PPU::EvaluateSprite()
   }
 
   // Copy to secondary OAM for the line rendering.
-  m_regs.secondary_oam[m_sprite_counter].y = m_oamData[sprite_index * 4 + 0];
-  m_regs.secondary_oam[m_sprite_counter].tile = m_oamData[sprite_index * 4 + 1];
-  m_regs.secondary_oam[m_sprite_counter].attribute = m_oamData[sprite_index * 4 + 2];
-  m_regs.secondary_oam[m_sprite_counter].x = m_oamData[sprite_index * 4 + 3];
+  m_regs.secondary_oam[m_sprite_counter].y = m_oam_ram[sprite_index * 4 + 0];
+  m_regs.secondary_oam[m_sprite_counter].tile = m_oam_ram[sprite_index * 4 + 1];
+  m_regs.secondary_oam[m_sprite_counter].attribute = m_oam_ram[sprite_index * 4 + 2];
+  m_regs.secondary_oam[m_sprite_counter].x = m_oam_ram[sprite_index * 4 + 3];
   m_regs.secondary_oam[m_sprite_counter].index = sprite_index;
   m_sprite_counter++;
 }
@@ -607,11 +609,11 @@ void PPU::Execute(CycleCount cycles)
       switch ((m_current_cycle - 257) % 8)
       {
         case 0:
-          FetchNameTableByte();
+          // FetchNameTableByte();
           break;
 
         case 2:
-          FetchAttributeTableByte();
+          // FetchAttributeTableByte();
           CalculateSpriteTileAddress(sprite_index);
           break;
 
