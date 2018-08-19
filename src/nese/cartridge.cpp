@@ -1,11 +1,14 @@
 #include "cartridge.h"
 #include "YBaseLib/ByteStream.h"
 #include "YBaseLib/Error.h"
+#include "YBaseLib/Log.h"
 #include "bus.h"
 #include "mappers/gxrom.h"
 #include "mappers/mmc1.h"
+#include "mappers/mmc3.h"
 #include "mappers/nrom.h"
 #include "mappers/uxrom.h"
+Log_SetChannel(Cartridge);
 
 #pragma pack(push, 1)
 struct INES_HEADER
@@ -170,6 +173,17 @@ std::unique_ptr<Cartridge> Cartridge::LoadINES(ByteStream* stream, Error* error)
       return false;
     }
   }
+
+  Log_InfoPrintf("Parsing INES file:");
+  Log_InfoPrintf("  Mapper ID: %u", data.mapper_id);
+  Log_InfoPrintf("  Mirroring: %u", data.mirror);
+  Log_InfoPrintf("  Battery: %s", data.battery ? "yes" : "no");
+  Log_InfoPrintf("  CHR ROM: %u (0x%x) bytes, %u 8KB banks", unsigned(data.chr_rom.size()),
+                 unsigned(data.prg_rom.size()), header.NumCHR);
+  Log_InfoPrintf("  CHR RAM: %u (0x%x) bytes", data.chr_ram_size);
+  Log_InfoPrintf("  PRG ROM: %u (0x%x) bytes, %u 16K banks", unsigned(data.prg_rom.size()),
+                 unsigned(data.prg_rom.size()), header.NumPRG);
+  Log_InfoPrintf("  PRG RAM: %u (0x%x) bytes", data.prg_ram_size);
 
   // allocate cartridge
   std::unique_ptr<Cartridge> cart;
