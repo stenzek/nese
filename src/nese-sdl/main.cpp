@@ -127,6 +127,16 @@ int main(int argc, char* argv[])
             controller->SetButtonState(StandardController::Button_Select, down);
             break;
         }
+
+        if (ev.type == SDL_KEYUP)
+        {
+          switch (ev.key.keysym.sym)
+          {
+            case SDLK_PAUSE:
+              system->Reset();
+              break;
+          }
+        }
       }
       else if (ev.type == SDL_QUIT)
       {
