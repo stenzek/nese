@@ -75,6 +75,9 @@ void Cartridge::WritePPUAddress(Bus* bus, u16 address, u8 value)
   if (address < 0x2000)
   {
     // Ignore writes to CHR-ROM.
+    if (m_chr_rom.empty())
+      m_chr_ram[address & 0x1FFF] = value;
+
     return;
   }
   else
