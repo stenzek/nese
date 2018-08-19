@@ -29,7 +29,11 @@ static std::unique_ptr<Cartridge> LoadCartridge(const char* filename)
   stream->Release();
 
   if (!cart)
+  {
     Log_ErrorPrintf("Cartridge load error: %s", load_error.GetErrorDescription().GetCharArray());
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Cartridge load error",
+                             load_error.GetErrorDescription().GetCharArray(), nullptr);
+  }
 
   return cart;
 }
