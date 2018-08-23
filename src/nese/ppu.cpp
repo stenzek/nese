@@ -402,7 +402,6 @@ void PPU::RenderPixel()
   if (m_flagShowSprites && (m_flagShowLeftSprites || x >= 8))
   {
     // The lowest sprite index must take precedence.
-    // We can't simply reverse the check with a break because of sprite 0.
     for (int8 sprite_index = 0; sprite_index < m_sprite_count; sprite_index++)
     {
       const auto& sprite = m_regs.sprites[sprite_index];
@@ -433,6 +432,7 @@ void PPU::RenderPixel()
       // Index sprite palette.
       sprite_color |= (sprite.attribute & 0x03) << 2;
       sprite_color += 16;
+      break;
     }
   }
 
