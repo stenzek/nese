@@ -16,6 +16,7 @@ public:
 
   u8 ReadPPUAddress(Bus* bus, u16 address) override final;
   void WritePPUAddress(Bus* bus, u16 address, u8 value) override final;
+  void PPUScanline(Bus* bus, u32 line, bool rendering_enabled) override final;
 
 protected:
   virtual bool Initialize(CartridgeData& data, Error* error) override final;

@@ -41,6 +41,7 @@ public:
   virtual void WriteCPUAddress(Bus* bus, u16 address, u8 value);
   virtual u8 ReadPPUAddress(Bus* bus, u16 address);
   virtual void WritePPUAddress(Bus* bus, u16 address, u8 value);
+  virtual void PPUScanline(Bus* bus, u32 line, bool rendering_enabled);
 
   static std::unique_ptr<Cartridge> Load(ByteStream* stream, Error* error);
 

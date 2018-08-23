@@ -87,6 +87,8 @@ void Cartridge::WritePPUAddress(Bus* bus, u16 address, u8 value)
   }
 }
 
+void Cartridge::PPUScanline(Bus* bus, u32 line, bool rendering_enabled) {}
+
 std::unique_ptr<Cartridge> Cartridge::Load(ByteStream* stream, Error* error)
 {
   uint32 cartSize = (uint32)stream->GetSize();

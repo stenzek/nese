@@ -232,3 +232,8 @@ void Bus::SetCPUIRQLine(bool active)
 {
   m_cpu->SetIRQLine(active);
 }
+
+void Bus::PPUScanline(u32 line, bool rendering_enabled)
+{
+  m_cartridge->PPUScanline(this, line, rendering_enabled);
+}

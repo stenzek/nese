@@ -328,6 +328,7 @@ void MMC3::WriteIRQEnable(Bus* bus, u8 value)
 
 void MMC3::IRQClock(Bus* bus, u16 address)
 {
+#if 0
   const u8 a12 = u8((address >> 12) & 0x01);
   if (m_last_chr_a12 != a12)
   {
@@ -347,6 +348,26 @@ void MMC3::IRQClock(Bus* bus, u16 address)
     }
 
     m_last_chr_a12 = a12;
+  }
+#endif
+}
+
+void MMC3::PPUScanline(Bus* bus, u32 line, bool rendering_enabled)
+{
+  // Only visible lines.
+  if ((line >= 240 && line < 261) || !rendering_enabled)
+    return;
+
+  // We should be using A12-based detection, but that's broken for now.
+  if (m_irq_counter == 0)
+  {
+    m_irq_counter = m_irq_reload_value;
+  }
+  else
+  {
+    m_irq_counter--;
+    if (m_irq_counter == 0 && m_irq_enable)
+      bus->SetCPUIRQLine(true);
   }
 }
 

@@ -54,6 +54,9 @@ public:
   // Sets/clears the IRQ line on the CPU.
   void SetCPUIRQLine(bool active);
 
+  // Notifies other components when the PPU finishes rendering a scanline.
+  void PPUScanline(u32 line, bool rendering_enabled);
+
 private:
   CPU* m_cpu = nullptr;
   PPU* m_ppu = nullptr;

@@ -538,6 +538,8 @@ void PPU::Execute(CycleCount cycles)
       m_nmi_flag = m_nmi_hold;
     else if ((m_current_scanline == 241 || m_current_scanline == 261) && m_current_cycle == 2)
       UpdateNMILine();
+    else if (m_current_cycle == 260)
+      m_bus->PPUScanline(m_current_scanline, IsRenderingEnabled());
 
     // 240-260 - Vertical Blank
     if (m_current_scanline >= 240 && m_current_scanline <= 260)
@@ -625,11 +627,11 @@ void PPU::Execute(CycleCount cycles)
       switch ((m_current_cycle - 257) % 8)
       {
         case 0:
-          // FetchNameTableByte();
+          FetchNameTableByte();
           break;
 
         case 2:
-          // FetchAttributeTableByte();
+          FetchAttributeTableByte();
           CalculateSpriteTileAddress(sprite_index);
           break;
 
