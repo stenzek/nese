@@ -487,21 +487,37 @@ void PPU::CalculateSpriteTileAddress(const u8 sprite_index)
   sprite.x = m_regs.secondary_oam[sprite_index].x;
   sprite.index = m_regs.secondary_oam[sprite_index].index;
 
+  // Line offset. This won't go negative because of the check in EvaluateSprite().
+  int32 sprite_row = (m_current_scanline - sprite.y);
+
   // Calculate sprite tile address.
   // For 8x16 sprites, the control register bit is ignored.
   if (m_sprite_height == 8)
-    m_regs.tile_address = m_sprite_table_address + (u16(sprite.tile) * 16);
+  {
+    // Vertical flip.
+    if (sprite.attribute & 0x80)
+      sprite_row ^= 7;
+
+    m_regs.tile_address = m_sprite_table_address + (u16(sprite.tile) * 16) + u16(sprite_row);
+  }
   else
-    m_regs.tile_address = (u16(sprite.tile & 0xFE) * 16) + (u16(sprite.tile & 0x01) * 0x1000);
+  {
+    u16 sprite_table_address = (sprite.tile & 0x01) * 0x1000;
+    u8 tile = (sprite.tile & 0xFE);
 
-  // Line offset. This won't go negative because of the check in EvaluateSprite().
-  int32 y_offset = (m_current_scanline - sprite.y) & (m_sprite_height - 1);
+    // Vertical split.
+    if (sprite.attribute & 0x80)
+      sprite_row ^= 15;
 
-  // Vertical flip.
-  if (sprite.attribute & 0x80)
-    y_offset ^= (m_sprite_height - 1);
+    if (sprite_row >= 8)
+    {
+      // Bottom half of 8x16 sprite.
+      tile++;
+      sprite_row -= 8;
+    }
 
-  m_regs.tile_address += y_offset;
+    m_regs.tile_address = sprite_table_address + (u16(tile) * 16) + u16(sprite_row);
+  }
 }
 
 void PPU::FetchLowSpriteTileByte(const u8 sprite_index)
