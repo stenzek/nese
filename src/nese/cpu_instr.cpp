@@ -586,9 +586,12 @@ u8 CPU::INSTR_INC(u8 value)
 
 void CPU::INSTR_INX()
 {
+  // Because these (INX/INY/DEX/DEY) don't write to memory, the cycle doesn't get added.
+  // Hence we have to do it explicitly.
   m_registers.X++;
   m_registers.SetFlagN((m_registers.X & 0x80) != 0);
   m_registers.SetFlagZ(m_registers.X == 0);
+  AddCycles(1);
 }
 
 void CPU::INSTR_INY()
@@ -596,6 +599,7 @@ void CPU::INSTR_INY()
   m_registers.Y++;
   m_registers.SetFlagN((m_registers.Y & 0x80) != 0);
   m_registers.SetFlagZ(m_registers.Y == 0);
+  AddCycles(1);
 }
 
 u8 CPU::INSTR_DEC(u8 value)
@@ -611,6 +615,7 @@ void CPU::INSTR_DEX()
   m_registers.X--;
   m_registers.SetFlagN((m_registers.X & 0x80) != 0);
   m_registers.SetFlagZ(m_registers.X == 0);
+  AddCycles(1);
 }
 
 void CPU::INSTR_DEY()
@@ -618,6 +623,7 @@ void CPU::INSTR_DEY()
   m_registers.Y--;
   m_registers.SetFlagN((m_registers.Y & 0x80) != 0);
   m_registers.SetFlagZ(m_registers.Y == 0);
+  AddCycles(1);
 }
 
 void CPU::INSTR_ADC(u8 value)
