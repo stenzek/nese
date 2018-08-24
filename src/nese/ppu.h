@@ -134,11 +134,9 @@ private:
   u8 m_oamAddress;
   u8 m_ppu_bus_value;
 
-  u8 Read(u16 address);
-  void Write(u16 address, u8 value);
-
-  u8 ReadPalette(u16 address);
-  void WritePalette(u16 address, u8 value);
+  u8 ReadCHR(u16 address);
+  u8 ReadCGRAM(u16 address);
+  void WriteCGRAM(u16 address, u8 value);
 
   u8 ReadStatus();
   u8 ReadOAMData();

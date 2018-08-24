@@ -124,57 +124,34 @@ void PPU::WriteRegister(u8 address, u8 value)
   }
 }
 
-u8 PPU::Read(u16 address)
+u8 PPU::ReadCHR(u16 address)
 {
-  address &= 0x3FFF;
-  if (address >= 0x3F00)
-  {
-    // CGRAM/Palette.
-    u8 palette_index = (address & 0x1F);
-
-    // Addresses $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C.
-    if ((palette_index & 0x13) == 0x10)
-      palette_index &= 0x0F;
-
-    if (m_grayscale_flag)
-      return m_palette_ram[palette_index] & 0x30;
-    else
-      return m_palette_ram[palette_index];
-  }
-
-  return m_bus->ReadPPUAddress(address);
+  return m_bus->ReadPPUAddress(address & 0x3FFF);
 }
 
-void PPU::Write(u16 address, u8 value)
+u8 PPU::ReadCGRAM(u16 address)
 {
-  address &= 0x3FFF;
-  if (address >= 0x3F00)
-  {
-    u8 palette_index = (address & 0x1F);
-    if ((palette_index & 0x13) == 0x10)
-      palette_index &= 0x0F;
+  // CGRAM/Palette.
+  u8 palette_index = (address & 0x1F);
 
-    m_palette_ram[palette_index] = value;
-    return;
-  }
+  // Addresses $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C.
+  if ((palette_index & 0x13) == 0x10)
+    palette_index &= 0x0F;
 
-  m_bus->WritePPUAddress(address, value);
+  if (m_grayscale_flag)
+    return m_palette_ram[palette_index] & 0x30;
+  else
+    return m_palette_ram[palette_index];
 }
 
-u8 PPU::ReadPalette(u16 address)
+void PPU::WriteCGRAM(u16 address, u8 value)
 {
-  if (address >= 16 && (address % 4) == 0)
-    address -= 16;
+  u8 palette_index = (address & 0x1F);
+  if ((palette_index & 0x13) == 0x10)
+    palette_index &= 0x0F;
 
-  return m_palette_ram[address];
-}
-
-void PPU::WritePalette(u16 address, u8 value)
-{
-  if (address >= 16 && (address % 4) == 0)
-    address -= 16;
-
-  m_palette_ram[address] = value;
+  m_palette_ram[palette_index] = value;
+  return;
 }
 
 void PPU::WriteControl(u8 value)
@@ -267,19 +244,18 @@ u8 PPU::ReadData()
   if (IsRenderingEnabled() && (m_current_scanline <= 240 || m_current_scanline == 261))
     return 0x00;
 
-  u16 address = m_regs.v.ppudata_address;
+  const u16 address = m_regs.v.ppudata_address;
+  const u8 buffered_data = m_ppu_bus_value;
+
+  m_ppu_bus_value = m_bus->ReadPPUAddress(address);
   m_regs.v.address += m_vram_increment;
-
-  u8 data = m_ppu_bus_value;
-  m_ppu_bus_value = Read(address);
-
-  // CGRAM reads go direct, but still update the bus.
-  // Currently, this is wrong.
-  if (address >= 0x3F00)
-    data = m_ppu_bus_value;
-
   // Log_DevPrintf("PPU read %04X %02X %02X", address, data, m_ppu_bus_value);
-  return data;
+
+  // CGRAM reads aren't buffered, but the read still occurs.
+  if (address >= 0x3F00)
+    return ReadCGRAM(address);
+  else
+    return buffered_data;
 }
 
 void PPU::WriteData(u8 value)
@@ -288,7 +264,12 @@ void PPU::WriteData(u8 value)
     return;
 
   // Log_DevPrintf("PPU write %04X %02X", m_regs.v.ppudata_address.GetValue(), value);
-  Write(m_regs.v.ppudata_address, value);
+  const u16 address = m_regs.v.ppudata_address;
+  if (address >= 0x3F00)
+    WriteCGRAM(address, value);
+  else
+    m_bus->WritePPUAddress(address, value);
+
   m_regs.v.address += m_vram_increment;
 }
 
@@ -319,14 +300,14 @@ void PPU::UpdateNMILine()
 void PPU::FetchNameTableByte()
 {
   const u16 address = 0x2000 | m_regs.v.nametable_address;
-  m_regs.nametable_byte = Read(address);
+  m_regs.nametable_byte = ReadCHR(address);
 }
 
 void PPU::FetchAttributeTableByte()
 {
   const u16 address =
     u16(0x23C0) | (u16(m_regs.v.nametable) << 10) | (u16(m_regs.v.tile_y >> 2) << 3) | (u16(m_regs.v.tile_x) >> 2);
-  m_regs.next_attribute_byte = Read(address);
+  m_regs.next_attribute_byte = ReadCHR(address);
 
   if (m_regs.v.tile_y & 2)
     m_regs.next_attribute_byte >>= 4;
@@ -362,12 +343,12 @@ void PPU::IncrementTileY()
 
 void PPU::FetchLowTileByte()
 {
-  m_regs.next_tile_data_low = Read(m_regs.tile_address);
+  m_regs.next_tile_data_low = ReadCHR(m_regs.tile_address);
 }
 
 void PPU::FetchHighTileByte()
 {
-  m_regs.next_tile_data_high = Read(m_regs.tile_address + 8);
+  m_regs.next_tile_data_high = ReadCHR(m_regs.tile_address + 8);
 }
 
 void PPU::StoreTileData()
@@ -440,9 +421,8 @@ void PPU::RenderPixel()
   if (sprite_color != 0 && (color == 0 || sprite_priority == 0))
     color = sprite_color;
 
-  u8 ci = ReadPalette(color);
-  uint32 c = PALETTE[ci % 64];
-  m_display->SetPixel(x, y, c);
+  DebugAssert(color < countof(m_palette_ram));
+  m_display->SetPixel(x, y, PALETTE[m_palette_ram[color] % countof(PALETTE)]);
 }
 
 void PPU::EvaluateSprite()
@@ -522,12 +502,12 @@ void PPU::CalculateSpriteTileAddress(const u8 sprite_index)
 
 void PPU::FetchLowSpriteTileByte(const u8 sprite_index)
 {
-  m_regs.sprites[sprite_index].tile_data_low = Read(m_regs.tile_address);
+  m_regs.sprites[sprite_index].tile_data_low = ReadCHR(m_regs.tile_address);
 }
 
 void PPU::FetchHighSpriteTileByte(const u8 sprite_index)
 {
-  m_regs.sprites[sprite_index].tile_data_high = Read(m_regs.tile_address + 8);
+  m_regs.sprites[sprite_index].tile_data_high = ReadCHR(m_regs.tile_address + 8);
 }
 
 void PPU::Execute(CycleCount cycles)
