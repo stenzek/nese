@@ -13,6 +13,7 @@ public:
   static const u32 SCREEN_HEIGHT = 240;
   static const u32 MAX_SPRITES_PER_LINE = 8;
   static const CycleCount CYCLES_PER_LINE = 341;
+  static const u32 OAM_RAM_SIZE = 256;
 
 public:
   PPU();
@@ -41,7 +42,7 @@ private:
   u32 m_current_scanline = 0;
 
   u8 m_palette_ram[32]; // CGRAM
-  u8 m_oam_ram[256];
+  u8 m_oam_ram[OAM_RAM_SIZE];
 
   struct
   {
@@ -131,7 +132,7 @@ private:
   u8 m_flagSpriteZeroHit;
   u8 m_flagSpriteOverflow;
 
-  u8 m_oamAddress;
+  u8 m_oam_address;
   u8 m_ppu_bus_value;
 
   u8 ReadCHR(u16 address);

@@ -67,7 +67,7 @@ void PPU::Reset()
   m_flagBlueTint = 0;
   m_flagSpriteZeroHit = 0;
   m_flagSpriteOverflow = 0;
-  m_oamAddress = 0;
+  m_oam_address = 0;
   m_ppu_bus_value = 0;
 
   WriteControl(0);
@@ -193,19 +193,19 @@ u8 PPU::ReadStatus()
 
 void PPU::WriteOAMAddress(u8 value)
 {
-  m_oamAddress = value;
+  m_oam_address = value;
 }
 
 u8 PPU::ReadOAMData()
 {
-  return m_oam_ram[m_oamAddress];
+  return m_oam_ram[m_oam_address];
 }
 
 void PPU::WriteOAMData(u8 value)
 {
-  DebugAssert(m_oamAddress <= sizeof(m_oam_ram));
-  m_oam_ram[m_oamAddress] = value;
-  m_oamAddress++;
+  DebugAssert(m_oam_address <= sizeof(m_oam_ram));
+  m_oam_ram[m_oam_address] = value;
+  m_oam_address++;
 }
 
 void PPU::WriteScroll(u8 value)
@@ -275,21 +275,31 @@ void PPU::WriteData(u8 value)
 
 void PPU::WriteDMA(u8 value)
 {
-  const uint32 start_address = uint32(value) << 8;
+  const u32 start_address = (u32(value) << 8);
+  const u32 end_address = start_address + OAM_RAM_SIZE;
+  u8 oam_buffer[OAM_RAM_SIZE];
 
   // We can optimize this if it's in WRAM.
-  if (start_address < 0x2000)
+  if (end_address <= 0x2000)
   {
-    std::memcpy(m_oam_ram, m_bus->GetWRAM() + (start_address & 0x7FF), 256);
+    std::memcpy(oam_buffer, m_bus->GetWRAM() + start_address, OAM_RAM_SIZE);
   }
   else
   {
     // Otherwise, we have to do byte reads (in case it's registers, or IO space, etc.)
-    for (u32 i = 0; i < 256; i++)
-      m_oam_ram[i] = m_bus->ReadCPUAddress(start_address + i);
+    for (u32 i = 0; i < OAM_RAM_SIZE; i++)
+      oam_buffer[i] = m_bus->ReadCPUAddress(start_address + i);
   }
 
   m_bus->StallCPU(513);
+
+  // OAM writes start at OAMADDR. OAMADDR is not written to.
+  u8 oam_offset = m_oam_address;
+  for (u32 i = 0; i < OAM_RAM_SIZE; i++)
+  {
+    m_oam_ram[oam_offset] = oam_buffer[i];
+    oam_offset = (oam_offset + 1) % OAM_RAM_SIZE;
+  }
 }
 
 void PPU::UpdateNMILine()
