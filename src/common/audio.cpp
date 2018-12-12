@@ -85,7 +85,7 @@ void Audio::WriteSamples(const SampleType* samples, u32 num_samples)
     const u32 to_this_buffer = std::min(m_buffer_size - buffer.write_position, remaining_samples);
 
     const u32 copy_count = to_this_buffer * m_channels;
-    std::memcpy(&buffer.data[buffer.read_position * m_channels], samples, copy_count * sizeof(SampleType));
+    std::memcpy(&buffer.data[buffer.write_position * m_channels], samples, copy_count * sizeof(SampleType));
     samples += copy_count;
 
     remaining_samples -= to_this_buffer;
