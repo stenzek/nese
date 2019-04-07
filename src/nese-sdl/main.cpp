@@ -80,10 +80,10 @@ static void HandleKeyEvent(const SDL_Event* ev, StandardController* nes_controll
 
 static void HandleControllerAxisEvent(const SDL_Event* ev, StandardController* nes_controller)
 {
-  printf("axis %d %d\n", ev->caxis.axis, ev->caxis.value);
+  // Log_DevPrintf("axis %d %d", ev->caxis.axis, ev->caxis.value);
 
   // use both analog sticks
-  if (ev->caxis.axis >= 4)
+  if (ev->caxis.axis > SDL_CONTROLLER_AXIS_RIGHTY)
     return;
 
   u8 negative_button, positive_button;
@@ -108,14 +108,21 @@ static void HandleControllerAxisEvent(const SDL_Event* ev, StandardController* n
 
 static void HandleControllerButtonEvent(const SDL_Event* ev, StandardController* nes_controller)
 {
-  // printf("button %d %s\n", ev->cbutton.button, ev->cbutton.state == SDL_PRESSED ? "pressed" : "released");
+  // Log_DevPrintf("button %d %s", ev->cbutton.button, ev->cbutton.state == SDL_PRESSED ? "pressed" : "released");
 
   // For xbox one controller..
-  static constexpr std::pair<u8, u8> button_mapping[] = {
-    {0, StandardController::Button_A},      {1, StandardController::Button_B},
-    {4, StandardController::Button_Select}, {6, StandardController::Button_Start},
-    {11, StandardController::Button_Up},    {12, StandardController::Button_Down},
-    {13, StandardController::Button_Left},  {14, StandardController::Button_Right}};
+  static constexpr std::pair<SDL_GameControllerButton, u8> button_mapping[] = {
+    {SDL_CONTROLLER_BUTTON_A, StandardController::Button_A},
+    {SDL_CONTROLLER_BUTTON_B, StandardController::Button_B},
+    {SDL_CONTROLLER_BUTTON_X, StandardController::Button_A},
+    {SDL_CONTROLLER_BUTTON_Y, StandardController::Button_B},
+    {SDL_CONTROLLER_BUTTON_BACK, StandardController::Button_Select},
+    {SDL_CONTROLLER_BUTTON_START, StandardController::Button_Start},
+    {SDL_CONTROLLER_BUTTON_GUIDE, StandardController::Button_Start},
+    {SDL_CONTROLLER_BUTTON_DPAD_UP, StandardController::Button_Up},
+    {SDL_CONTROLLER_BUTTON_DPAD_DOWN, StandardController::Button_Down},
+    {SDL_CONTROLLER_BUTTON_DPAD_LEFT, StandardController::Button_Left},
+    {SDL_CONTROLLER_BUTTON_DPAD_LEFT, StandardController::Button_Right}};
 
   for (const auto& bm : button_mapping)
   {
