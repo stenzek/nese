@@ -66,8 +66,8 @@ void System::FrameStep()
   while (m_frame_number == prev_frame_number)
   {
     const u32 cpu_cycles = std::min(m_ppu->GetMaxExecutionDelay(), m_apu->GetMaxExecutionDelay());
-    // m_cpu->Execute(cpu_cycles);
-    m_cpu->Execute(1);
+    m_cpu->Execute(cpu_cycles);
+    // m_cpu->Execute(1);
     m_bus->ExecutePendingCycles();
   }
 }
