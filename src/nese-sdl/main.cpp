@@ -11,6 +11,7 @@
 #include <SDL/SDL.h>
 #include <cstdio>
 #include <cstdlib>
+#include <map>
 Log_SetChannel(Main);
 
 bool g_running = true;
@@ -36,6 +37,45 @@ static std::unique_ptr<Cartridge> LoadCartridge(const char* filename)
   }
 
   return cart;
+}
+
+static void HandleKeyEvent(const SDL_Event* ev, StandardController* nes_controller)
+{
+  const bool down = (ev->type == SDL_KEYDOWN);
+  switch (ev->key.keysym.sym)
+  {
+    case SDLK_w:
+    case SDLK_UP:
+      nes_controller->SetButtonState(StandardController::Button_Up, down);
+      break;
+    case SDLK_s:
+    case SDLK_DOWN:
+      nes_controller->SetButtonState(StandardController::Button_Down, down);
+      break;
+    case SDLK_a:
+    case SDLK_LEFT:
+      nes_controller->SetButtonState(StandardController::Button_Left, down);
+      break;
+    case SDLK_d:
+    case SDLK_RIGHT:
+      nes_controller->SetButtonState(StandardController::Button_Right, down);
+      break;
+
+    case SDLK_z:
+      nes_controller->SetButtonState(StandardController::Button_B, down);
+      break;
+    case SDLK_x:
+      nes_controller->SetButtonState(StandardController::Button_A, down);
+      break;
+
+    case SDLK_RETURN:
+      nes_controller->SetButtonState(StandardController::Button_Start, down);
+      break;
+    case SDLK_LCTRL:
+    case SDLK_RCTRL:
+      nes_controller->SetButtonState(StandardController::Button_Select, down);
+      break;
+  }
 }
 
 static void HandleControllerAxisEvent(const SDL_Event* ev, StandardController* nes_controller)
@@ -110,14 +150,14 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  std::vector<SDL_GameController*> controllers;
+  std::map<int, SDL_GameController*> controllers;
   for (int i = 0; i < SDL_NumJoysticks(); i++)
   {
     SDL_GameController* gcontroller = SDL_GameControllerOpen(i);
     if (gcontroller)
     {
       Log_InfoPrintf("Opened controller %d: %s", i, SDL_GameControllerName(gcontroller));
-      controllers.push_back(gcontroller);
+      controllers.emplace(i, gcontroller);
     }
     else
     {
@@ -159,50 +199,35 @@ int main(int argc, char* argv[])
         case SDL_KEYDOWN:
         case SDL_KEYUP:
         {
-          const bool down = (ev.type == SDL_KEYDOWN);
-          switch (ev.key.keysym.sym)
+          HandleKeyEvent(&ev, controller.get());
+          if (ev.type == SDL_KEYUP && ev.key.keysym.sym == SDLK_PAUSE)
+            system->Reset();
+        }
+        break;
+
+        case SDL_CONTROLLERDEVICEADDED:
+        {
+          auto iter = controllers.find(ev.cdevice.which);
+          if (iter == controllers.end())
           {
-            case SDLK_w:
-            case SDLK_UP:
-              controller->SetButtonState(StandardController::Button_Up, down);
-              break;
-            case SDLK_s:
-            case SDLK_DOWN:
-              controller->SetButtonState(StandardController::Button_Down, down);
-              break;
-            case SDLK_a:
-            case SDLK_LEFT:
-              controller->SetButtonState(StandardController::Button_Left, down);
-              break;
-            case SDLK_d:
-            case SDLK_RIGHT:
-              controller->SetButtonState(StandardController::Button_Right, down);
-              break;
-
-            case SDLK_z:
-              controller->SetButtonState(StandardController::Button_B, down);
-              break;
-            case SDLK_x:
-              controller->SetButtonState(StandardController::Button_A, down);
-              break;
-
-            case SDLK_RETURN:
-              controller->SetButtonState(StandardController::Button_Start, down);
-              break;
-            case SDLK_LCTRL:
-            case SDLK_RCTRL:
-              controller->SetButtonState(StandardController::Button_Select, down);
-              break;
-          }
-
-          if (ev.type == SDL_KEYUP)
-          {
-            switch (ev.key.keysym.sym)
+            SDL_GameController* gcontroller = SDL_GameControllerOpen(ev.cdevice.which);
+            if (gcontroller)
             {
-              case SDLK_PAUSE:
-                system->Reset();
-                break;
+              Log_InfoPrintf("Controller %s inserted", SDL_GameControllerName(gcontroller));
+              controllers.emplace(ev.cdevice.which, gcontroller);
             }
+          }
+        }
+        break;
+
+        case SDL_CONTROLLERDEVICEREMOVED:
+        {
+          auto iter = controllers.find(ev.cdevice.which);
+          if (iter != controllers.end())
+          {
+            Log_InfoPrintf("Controller %s removed", SDL_GameControllerName(iter->second));
+            SDL_GameControllerClose(iter->second);
+            controllers.erase(iter);
           }
         }
         break;
@@ -223,8 +248,8 @@ int main(int argc, char* argv[])
     }
   }
 
-  for (SDL_GameController* controller : controllers)
-    SDL_GameControllerClose(controller);
+  for (auto& gc : controllers)
+    SDL_GameControllerClose(gc.second);
 
   SDL_Quit();
   return EXIT_SUCCESS;
