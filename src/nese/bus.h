@@ -68,5 +68,5 @@ private:
   CycleCount m_pending_cycles = 0;
 
   byte m_wram[WRAM_SIZE];
-  byte m_vram[WRAM_SIZE];
+  byte m_vram[VRAM_SIZE];
 };
