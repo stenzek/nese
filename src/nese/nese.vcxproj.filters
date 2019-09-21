@@ -26,6 +26,9 @@
     <ClInclude Include="mappers\mmc3.h">
       <Filter>mappers</Filter>
     </ClInclude>
+    <ClInclude Include="mappers\axrom.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="apu.cpp" />
@@ -50,6 +53,9 @@
       <Filter>mappers</Filter>
     </ClCompile>
     <ClCompile Include="mappers\mmc3.cpp">
+      <Filter>mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="mappers\axrom.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
   </ItemGroup>

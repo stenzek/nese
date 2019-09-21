@@ -3,6 +3,7 @@
 #include "YBaseLib/Error.h"
 #include "YBaseLib/Log.h"
 #include "bus.h"
+#include "mappers/axrom.h"
 #include "mappers/gxrom.h"
 #include "mappers/mmc1.h"
 #include "mappers/mmc3.h"
@@ -208,6 +209,10 @@ std::unique_ptr<Cartridge> Cartridge::LoadINES(ByteStream* stream, Error* error)
 
     case 4:
       cart = std::make_unique<Mappers::MMC3>();
+      break;
+
+    case 7:
+      cart = std::make_unique<Mappers::AxROM>();
       break;
 
     case 66:
