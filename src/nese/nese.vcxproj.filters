@@ -1,36 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="apu.h" />
-    <ClInclude Include="bus.h" />
-    <ClInclude Include="cartridge.h" />
-    <ClInclude Include="controller.h" />
-    <ClInclude Include="cpu.h" />
-    <ClInclude Include="cpu_instruction_list.h" />
-    <ClInclude Include="ppu.h" />
-    <ClInclude Include="system.h" />
-    <ClInclude Include="types.h" />
-    <ClInclude Include="mappers\mmc1.h">
-      <Filter>mappers</Filter>
-    </ClInclude>
-    <ClInclude Include="mappers\gxrom.h">
-      <Filter>mappers</Filter>
-    </ClInclude>
-    <ClInclude Include="mappers\uxrom.h">
-      <Filter>mappers</Filter>
-    </ClInclude>
-    <ClInclude Include="cpu_debug_interface.h" />
-    <ClInclude Include="mappers\nrom.h">
-      <Filter>mappers</Filter>
-    </ClInclude>
-    <ClInclude Include="mappers\mmc3.h">
-      <Filter>mappers</Filter>
-    </ClInclude>
-    <ClInclude Include="mappers\axrom.h">
-      <Filter>mappers</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="apu.cpp" />
     <ClCompile Include="bus.cpp" />
     <ClCompile Include="cartridge.cpp" />
@@ -40,28 +10,57 @@
     <ClCompile Include="cpu_instr.cpp" />
     <ClCompile Include="ppu.cpp" />
     <ClCompile Include="system.cpp" />
-    <ClCompile Include="mappers\mmc1.cpp">
+    <ClCompile Include="mappers\axrom.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
     <ClCompile Include="mappers\gxrom.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
-    <ClCompile Include="mappers\uxrom.cpp">
-      <Filter>mappers</Filter>
-    </ClCompile>
-    <ClCompile Include="mappers\nrom.cpp">
+    <ClCompile Include="mappers\mmc1.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
     <ClCompile Include="mappers\mmc3.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
-    <ClCompile Include="mappers\axrom.cpp">
+    <ClCompile Include="mappers\nrom.cpp">
+      <Filter>mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="mappers\uxrom.cpp">
       <Filter>mappers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="apu.h" />
+    <ClInclude Include="bus.h" />
+    <ClInclude Include="cartridge.h" />
+    <ClInclude Include="controller.h" />
+    <ClInclude Include="cpu.h" />
+    <ClInclude Include="cpu_instruction_list.h" />
+    <ClInclude Include="ppu.h" />
+    <ClInclude Include="system.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="mappers\axrom.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="mappers\gxrom.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="mappers\mmc1.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="mappers\mmc3.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="mappers\nrom.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="mappers\uxrom.h">
+      <Filter>mappers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="mappers">
-      <UniqueIdentifier>{bf5210af-e02c-455d-a99e-13e6ffd2de54}</UniqueIdentifier>
+      <UniqueIdentifier>{20ee462c-80ba-435a-af50-49fced031584}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

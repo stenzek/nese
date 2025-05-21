@@ -1,35 +1,41 @@
 #include "apu.h"
-#include "YBaseLib/Timer.h"
 #include "bus.h"
-#include "common/audio.h"
-#include "nes_apu/Blip_Buffer.h"
-#include "nes_apu/Nes_Apu.h"
-#include "nes_apu/apu_snapshot.h"
+#include "system.h"
 
-APU::APU() : m_apu(std::make_unique<Nes_Apu>()), m_buffer(std::make_unique<Blip_Buffer>()) {}
+#include "common/log.h"
+
+#include "Nes_Snd_Emu/Blip_Buffer.h"
+#include "Nes_Snd_Emu/Nes_Apu.h"
+#include "Nes_Snd_Emu/apu_snapshot.h"
+
+#include "retro2/retro2_session.h"
+
+LOG_CHANNEL(APU);
+
+APU::APU() : m_apu(std::make_unique<Nes_Apu>()), m_buffer(std::make_unique<Blip_Buffer>())
+{
+  m_stream = R2Session.CreateAudioStream(OUTPUT_SAMPLE_RATE, 1, true, nullptr);
+}
 
 APU::~APU()
 {
-  if (m_audio)
-    m_audio->PauseOutput(true);
+  if (m_stream)
+    R2Session.DestroyAudioStream(m_stream);
 }
 
-void APU::Initialize(Bus* bus, Audio* audio)
+void APU::Initialize(Bus* bus)
 {
   m_bus = bus;
-  m_audio = audio;
-
+  
   m_buffer->clock_rate(1789773);
-  m_buffer->sample_rate(m_audio->GetOutputSampleRate());
+  m_buffer->sample_rate(OUTPUT_SAMPLE_RATE);
   m_apu->output(m_buffer.get());
   m_apu->dmc_reader(DMCReadCallback, this);
   m_apu->irq_notifier(IRQNotifierCallback, this);
 
-  m_audio->PauseOutput(false);
-
   // m_mix_interval = (1789773 + (m_audio->GetBufferSize() - 1)) / m_audio->GetBufferSize();
   m_mix_interval = (1789773 + (60 - 1)) / 60;
-  std::fprintf(stderr, "Audio output every %d cycles\n", m_mix_interval);
+  INFO_LOG("Audio output every {} cycles", m_mix_interval);
 }
 
 void APU::Reset()
@@ -67,6 +73,9 @@ CycleCount APU::GetMaxExecutionDelay() const
   return (m_mix_interval - m_time_since_last_mix);
 }
 
+//#include "common/wav_reader_writer.h"
+//static WAVWriter www;
+
 void APU::Execute(CycleCount cycles)
 {
   m_time_since_last_mix += cycles;
@@ -77,16 +86,35 @@ void APU::Execute(CycleCount cycles)
     m_buffer->end_frame(m_time_since_last_mix);
     m_time_since_last_mix = 0;
 
-    while (m_buffer->samples_avail() > 0)
+      // gather samples
+    size_t remaining = m_buffer->samples_avail();
+    while (remaining > 0)
     {
-      Audio::SampleType* samples;
-      u32 free_sample_count;
-      m_audio->BeginWrite(&samples, &free_sample_count);
+      int16_t* samples;
+      uint32_t max_frames;
+      R2Session.BeginWriteAudioFrames(m_stream, &samples, &max_frames);
 
-      u32 max_samples = std::min(u32(m_buffer->samples_avail()), free_sample_count);
+      size_t to_copy = std::min(remaining, static_cast<size_t>(max_frames));
+      if (to_copy > 0)
+      {
+        m_buffer->read_samples(samples, static_cast<long>(to_copy));
 
-      u32 num_samples_read = m_buffer->read_samples(samples, max_samples);
-      m_audio->EndWrite(max_samples);
+#if 0
+        static bool done = false;
+        if (!www.IsOpen() && !done)
+          www.Open("D:\\blah.wav", OUTPUT_SAMPLE_RATE, 1);
+        if (www.IsOpen())
+        {
+          www.WriteFrames(samples, to_copy);
+          if (done)
+            www.Close(nullptr);
+        }
+#endif
+      }
+        
+
+      remaining -= to_copy;
+      R2Session.EndWriteAudioFrames(m_stream, to_copy);
 
 #if 0
       static Timer t;

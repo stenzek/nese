@@ -2,7 +2,6 @@
 #include "types.h"
 
 class Bus;
-class String;
 class System;
 
 class CPU
@@ -167,7 +166,7 @@ public:
   void Execute(CycleCount cycles);
 
   // disassemble an instruction
-  bool Disassemble(String* pDestination, u16 address, u16* size);
+  bool Disassemble(char* buf, size_t buf_len, u16 address, u16* size);
 
   // trigger a NMI, IRQ
   void SetNMILine(bool state);

@@ -2,8 +2,13 @@
 .DS_Store
 
 # binaries folder
-bin
-Build
+/bin/
+/build/
+/build-*/
+
+# dependency build temp files
+deps-build/
+/deps/
 
 # vs stuff
 .vs
@@ -15,6 +20,7 @@ ipch/*
 *.vcxproj.user
 *.VC.opendb
 *.VC.db
+/.vscode/
 
 # cmake stuff
 CMakeCache.txt
@@ -22,6 +28,7 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 install_manifest.txt
+/.cache/
 
 # unix intermediate files
 config.h
@@ -32,4 +39,10 @@ config.h
 
 # qt creator
 CMakeLists.txt.user
+
+# python bytecode
+__pycache__
+
+# other repos
+/android
 

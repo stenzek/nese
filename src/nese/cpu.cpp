@@ -1,11 +1,11 @@
-#include "nese/cpu.h"
-#include "YBaseLib/Assert.h"
-#include "YBaseLib/Log.h"
-#include "YBaseLib/Memory.h"
-#include "YBaseLib/String.h"
-#include "nese/bus.h"
-#include "nese/system.h"
-Log_SetChannel(CPU);
+#include "cpu.h"
+#include "bus.h"
+#include "system.h"
+
+#include "common/assert.h"
+#include "common/log.h"
+
+LOG_CHANNEL(CPU);
 
 CPU::CPU() = default;
 
@@ -34,7 +34,9 @@ void CPU::Reset()
   /// m_registers.PC = 0xC000;
 }
 
+#if 0
 static bool disasm_enabled = false;
+#endif
 
 void CPU::Execute(CycleCount cycles)
 {
@@ -60,6 +62,7 @@ void CPU::Execute(CycleCount cycles)
     }
     else
     {
+#if 0
       // debug
       if (disasm_enabled)
       {
@@ -77,6 +80,7 @@ void CPU::Execute(CycleCount cycles)
           std::fprintf(stdout, "disasm fail at %04X\n", m_registers.PC);
         }
       }
+#endif
 
       ExecuteInstruction();
     }

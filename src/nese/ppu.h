@@ -2,9 +2,10 @@
 #include "common/bitfield.h"
 #include "types.h"
 
+#include <memory>
+
 class System;
 class Bus;
-class Display;
 
 class PPU
 {
@@ -19,7 +20,7 @@ public:
   PPU();
   ~PPU();
 
-  void Initialize(System* system, Bus* bus, Display* display);
+  void Initialize(System* system, Bus* bus);
   void Reset();
 
   u8 ReadRegister(u8 address);
@@ -36,7 +37,7 @@ private:
 
   System* m_system = nullptr;
   Bus* m_bus = nullptr;
-  Display* m_display = nullptr;
+  std::unique_ptr<u32[]> m_framebuffer;
 
   CycleCount m_current_cycle = 0;
   u32 m_current_scanline = 0;

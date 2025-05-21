@@ -1,8 +1,12 @@
 #include "mmc3.h"
 #include "../bus.h"
-#include "YBaseLib/Error.h"
-#include "YBaseLib/Log.h"
-Log_SetChannel(Mappers::MMC3);
+
+#include "common/align.h"
+#include "common/error.h"
+#include "common/bitutils.h"
+#include "common/log.h"
+
+LOG_CHANNEL(MMC3);
 
 namespace Mappers {
 MMC3::MMC3() = default;
@@ -18,13 +22,13 @@ bool MMC3::Initialize(CartridgeData& data, Error* error)
 
   if (!Common::IsAlignedPow2(m_prg_rom.size(), 8192))
   {
-    error->SetErrorUserFormatted(1, "PRG-ROM (%u) must be aligned to %u bytes.", u32(m_prg_rom.size()), 8192);
+    Error::SetStringFmt(error, "PRG-ROM ({}) must be aligned to {} bytes.", m_prg_rom.size(), 8192);
     return false;
   }
 
   if (!Common::IsAlignedPow2(m_chr_rom.size(), 2048))
   {
-    error->SetErrorUserFormatted(1, "CHR-ROM (%u) must be aligned to %u bytes.", u32(m_chr_rom.size()), 2048);
+    Error::SetStringFmt(error, "CHR-ROM ({}) must be aligned to {} bytes.", m_chr_rom.size(), 2048);
     return false;
   }
 

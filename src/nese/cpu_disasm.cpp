@@ -1,6 +1,8 @@
-#include "YBaseLib/String.h"
-#include "nese/bus.h"
-#include "nese/cpu.h"
+#include "bus.h"
+#include "cpu.h"
+
+#include <algorithm>
+#include <cstdio>
 
 struct DisassemblyTableEntry
 {
@@ -24,7 +26,7 @@ static const DisassemblyTableEntry opcodes[256] = {
 #define INSTRUCTION_ABS(name) {#name, CPU::AddressingMode::Absolute},
 #define INSTRUCTION_IZX(name) {#name, CPU::AddressingMode::IndexedIndirect},
 #define INSTRUCTION_IZY(name) {#name, CPU::AddressingMode::IndirectIndexed},
-#include "nese/cpu_instruction_list.h"
+#include "cpu_instruction_list.h"
 #undef INSTRUCTION_IMP
 #undef INSTRUCTION_ACC
 #undef INSTRUCTION_IMM
@@ -41,7 +43,7 @@ static const DisassemblyTableEntry opcodes[256] = {
 #undef INSTRUCTION_IZY
 };
 
-bool CPU::Disassemble(String* pString, u16 address, u16* size)
+bool CPU::Disassemble(char* buf, size_t buf_len, u16 address, u16* size)
 {
   const u8 opcode = m_bus->ReadCPUAddress(address);
   const DisassemblyTableEntry* entry = &opcodes[opcode];
@@ -49,8 +51,9 @@ bool CPU::Disassemble(String* pString, u16 address, u16* size)
   u8 operand_2 = 0;
   u16 length = 1;
 
-  pString->Clear();
-  pString->AppendFormattedString("%04X  ", address);
+  char* const buf_end = buf + buf_len;
+#define APPEND(...) buf += std::max(std::snprintf(buf, buf_end - buf, __VA_ARGS__), 1)
+  APPEND("%04X  ", address);
 
   switch (entry->addressing_mode)
   {
@@ -63,7 +66,7 @@ bool CPU::Disassemble(String* pString, u16 address, u16* size)
     case CPU::AddressingMode::Relative:
       length = 2;
       operand_1 = m_bus->ReadCPUAddress(address + 1);
-      pString->AppendFormattedString("%02X %02X     ", opcode, operand_1);
+      APPEND("%02X %02X     ", opcode, operand_1);
       break;
 
     case CPU::AddressingMode::Absolute:
@@ -74,37 +77,37 @@ bool CPU::Disassemble(String* pString, u16 address, u16* size)
       length = 3;
       operand_1 = m_bus->ReadCPUAddress(address + 1);
       operand_2 = m_bus->ReadCPUAddress(address + 2);
-      pString->AppendFormattedString("%02X %02X %02X  ", opcode, operand_1, operand_2);
+      APPEND("%02X %02X %02X  ", opcode, operand_1, operand_2);
       break;
 
     default:
-      pString->AppendFormattedString("%02X        ", opcode);
+      APPEND("%02X        ", opcode);
       break;
   }
 
-  pString->AppendString(entry->instruction_name);
+  APPEND("%s", entry->instruction_name);
 
 #if 0
   u16 pointer_address, temp_address;
   switch (entry->addressing_mode)
   {
     case CPU::AddressingMode::Immediate:
-      pString->AppendFormattedString(" #$%02X", operand_1);
+      APPEND(" #$%02X", operand_1);
       break;
 
     case CPU::AddressingMode::ZeroPage:
-      pString->AppendFormattedString(" $%02X = %02X", operand_1, m_bus->ReadCPUAddress(u16(operand_1)));
+      APPEND(" $%02X = %02X", operand_1, m_bus->ReadCPUAddress(u16(operand_1)));
       break;
 
     case CPU::AddressingMode::ZeroPageX:
       temp_address = (u16(operand_1) + m_registers.X) & 0xFF;
-      pString->AppendFormattedString(" $%02X,X @ %02X = %02X", operand_1, temp_address,
+      APPEND(" $%02X,X @ %02X = %02X", operand_1, temp_address,
                                      m_bus->ReadCPUAddress(temp_address));
       break;
 
     case CPU::AddressingMode::ZeroPageY:
       temp_address = (u16(operand_1) + m_registers.Y) & 0xFF;
-      pString->AppendFormattedString(" $%02X,Y @ %02X = %02X", operand_1, temp_address,
+      APPEND(" $%02X,Y @ %02X = %02X", operand_1, temp_address,
                                      m_bus->ReadCPUAddress(temp_address));
       break;
 
@@ -112,7 +115,7 @@ bool CPU::Disassemble(String* pString, u16 address, u16* size)
       pointer_address = (operand_1 + m_registers.X) & 0xFF;
       temp_address = u16(m_bus->ReadCPUAddress(pointer_address)) |
                      ((u16(m_bus->ReadCPUAddress((pointer_address & 0xFF00) | ((pointer_address + 1) & 0xFF)))) << 8);
-      pString->AppendFormattedString(" ($%02X,X) @ %02X = %04X = %02X", operand_1, pointer_address, temp_address,
+      APPEND(" ($%02X,X) @ %02X = %04X = %02X", operand_1, pointer_address, temp_address,
                                      m_bus->ReadCPUAddress(temp_address));
       break;
 
@@ -120,46 +123,46 @@ bool CPU::Disassemble(String* pString, u16 address, u16* size)
       pointer_address =
         u16(m_bus->ReadCPUAddress(operand_1)) | (u16(m_bus->ReadCPUAddress((u16(operand_1) + 1) & 0xFF)) << 8);
       temp_address = pointer_address + m_registers.Y;
-      pString->AppendFormattedString(" ($%02X),Y = %04X @ %04X = %02X", operand_1, pointer_address, temp_address,
+      APPEND(" ($%02X),Y = %04X @ %04X = %02X", operand_1, pointer_address, temp_address,
                                      MemoryReadByte(temp_address));
       break;
 
     case CPU::AddressingMode::Relative:
-      pString->AppendFormattedString(" $%04X", (address + length + u16(int16(int8(operand_1)))) & 0xFFFF);
+      APPEND(" $%04X", (address + length + u16(int16(int8(operand_1)))) & 0xFFFF);
       break;
 
     case CPU::AddressingMode::Absolute:
       temp_address = u16(operand_1) | (u16(operand_2) << 8);
-      pString->AppendFormattedString(" $%04X = %02X", temp_address, m_bus->ReadCPUAddress(temp_address));
+      APPEND(" $%04X = %02X", temp_address, m_bus->ReadCPUAddress(temp_address));
       break;
 
     case CPU::AddressingMode::AbsoluteX:
       pointer_address = (u16(operand_1) | (u16(operand_2) << 8));
       temp_address = pointer_address + m_registers.X;
-      pString->AppendFormattedString(" $%04X,X @ %04X = %02X", pointer_address, temp_address,
+      APPEND(" $%04X,X @ %04X = %02X", pointer_address, temp_address,
                                      m_bus->ReadCPUAddress(temp_address));
       break;
 
     case CPU::AddressingMode::AbsoluteY:
       pointer_address = (u16(operand_1) | (u16(operand_2) << 8));
       temp_address = pointer_address + m_registers.Y;
-      pString->AppendFormattedString(" $%04X,Y @ %04X = %02X", pointer_address, temp_address,
+      APPEND(" $%04X,Y @ %04X = %02X", pointer_address, temp_address,
                                      m_bus->ReadCPUAddress(temp_address));
       break;
 
     case CPU::AddressingMode::Direct:
-      pString->AppendFormattedString(" $%04X", u16(operand_1) | (u16(operand_2) << 8));
+      APPEND(" $%04X", u16(operand_1) | (u16(operand_2) << 8));
       break;
 
     case CPU::AddressingMode::Indirect:
       pointer_address = (u16(operand_1) | (u16(operand_2) << 8));
       temp_address =
         u16(m_bus->ReadCPUAddress(pointer_address)) | (u16(m_bus->ReadCPUAddress(pointer_address + 1)) << 8);
-      pString->AppendFormattedString(" ($%04X) = %04X", pointer_address, temp_address);
+      APPEND(" ($%04X) = %04X", pointer_address, temp_address);
       break;
 
     case CPU::AddressingMode::Accumulator:
-      pString->AppendFormattedString(" A");
+      APPEND(" A");
       break;
 
     case CPU::AddressingMode::Implicit:
@@ -173,71 +176,71 @@ bool CPU::Disassemble(String* pString, u16 address, u16* size)
   switch (entry->addressing_mode)
   {
     case CPU::AddressingMode::Immediate:
-      pString->AppendFormattedString(" #$%02X", operand_1);
+      APPEND(" #$%02X", operand_1);
       break;
 
     case CPU::AddressingMode::ZeroPage:
-      pString->AppendFormattedString(" $%02X = %02X", operand_1, m_bus->ReadCPUAddress(u16(operand_1)));
+      APPEND(" $%02X = %02X", operand_1, m_bus->ReadCPUAddress(u16(operand_1)));
       break;
 
     case CPU::AddressingMode::ZeroPageX:
       temp_address = (u16(operand_1) + m_registers.X) & 0xFF;
-      pString->AppendFormattedString(" $%02X,X @ %02X", operand_1, temp_address);
+      APPEND(" $%02X,X @ %02X", operand_1, temp_address);
       break;
 
     case CPU::AddressingMode::ZeroPageY:
       temp_address = (u16(operand_1) + m_registers.Y) & 0xFF;
-      pString->AppendFormattedString(" $%02X,Y @ %02X", operand_1, temp_address);
+      APPEND(" $%02X,Y @ %02X", operand_1, temp_address);
       break;
 
     case CPU::AddressingMode::IndexedIndirect:
       pointer_address = (operand_1 + m_registers.X) & 0xFF;
       temp_address = u16(m_bus->ReadCPUAddress(pointer_address)) |
                      ((u16(m_bus->ReadCPUAddress((pointer_address & 0xFF00) | ((pointer_address + 1) & 0xFF)))) << 8);
-      pString->AppendFormattedString(" ($%02X,X) @ %02X = %04X", operand_1, pointer_address, temp_address);
+      APPEND(" ($%02X,X) @ %02X = %04X", operand_1, pointer_address, temp_address);
       break;
 
     case CPU::AddressingMode::IndirectIndexed:
       pointer_address =
         u16(m_bus->ReadCPUAddress(operand_1)) | (u16(m_bus->ReadCPUAddress((u16(operand_1) + 1) & 0xFF)) << 8);
       temp_address = pointer_address + m_registers.Y;
-      pString->AppendFormattedString(" ($%02X),Y = %04X @ %04X", operand_1, pointer_address, temp_address);
+      APPEND(" ($%02X),Y = %04X @ %04X", operand_1, pointer_address, temp_address);
       break;
 
     case CPU::AddressingMode::Relative:
-      pString->AppendFormattedString(" $%04X", (address + length + u16(int16(int8(operand_1)))) & 0xFFFF);
+      APPEND(" $%04X", (address + length + u16(int16(int8(operand_1)))) & 0xFFFF);
       break;
 
     case CPU::AddressingMode::Absolute:
       temp_address = u16(operand_1) | (u16(operand_2) << 8);
-      pString->AppendFormattedString(" $%04X", temp_address);
+      APPEND(" $%04X", temp_address);
       break;
 
     case CPU::AddressingMode::AbsoluteX:
       pointer_address = (u16(operand_1) | (u16(operand_2) << 8));
       temp_address = pointer_address + m_registers.X;
-      pString->AppendFormattedString(" $%04X,X @ %04X", pointer_address, temp_address);
+      APPEND(" $%04X,X @ %04X", pointer_address, temp_address);
       break;
 
     case CPU::AddressingMode::AbsoluteY:
       pointer_address = (u16(operand_1) | (u16(operand_2) << 8));
       temp_address = pointer_address + m_registers.Y;
-      pString->AppendFormattedString(" $%04X,Y @ %04X", pointer_address, temp_address);
+      APPEND(" $%04X,Y @ %04X", pointer_address, temp_address);
       break;
 
     case CPU::AddressingMode::Direct:
-      pString->AppendFormattedString(" $%04X", u16(operand_1) | (u16(operand_2) << 8));
+      APPEND(" $%04X", u16(operand_1) | (u16(operand_2) << 8));
       break;
 
     case CPU::AddressingMode::Indirect:
       pointer_address = (u16(operand_1) | (u16(operand_2) << 8));
       temp_address =
         u16(m_bus->ReadCPUAddress(pointer_address)) | (u16(m_bus->ReadCPUAddress(pointer_address + 1)) << 8);
-      pString->AppendFormattedString(" ($%04X) = %04X", pointer_address, temp_address);
+      APPEND(" ($%04X) = %04X", pointer_address, temp_address);
       break;
 
     case CPU::AddressingMode::Accumulator:
-      pString->AppendFormattedString(" A");
+      APPEND(" A");
       break;
 
     case CPU::AddressingMode::Implicit:

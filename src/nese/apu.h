@@ -2,7 +2,6 @@
 #include "types.h"
 #include <memory>
 
-class Audio;
 class Bus;
 class Nes_Apu;
 class Blip_Buffer;
@@ -13,7 +12,7 @@ public:
   APU();
   ~APU();
 
-  void Initialize(Bus* bus, Audio* audio);
+  void Initialize(Bus* bus);
   void Reset();
 
   u8 ReadRegister(u8 address);
@@ -24,13 +23,15 @@ public:
   void Execute(CycleCount cycles);
 
 private:
+  static constexpr u32 OUTPUT_SAMPLE_RATE = 44100;
+
   void UpdateIRQDelay();
 
   static int DMCReadCallback(void* userdata, unsigned address);
   static void IRQNotifierCallback(void* userdata);
 
   Bus* m_bus = nullptr;
-  Audio* m_audio = nullptr;
+  void* m_stream = nullptr;
 
   std::unique_ptr<Nes_Apu> m_apu;
   std::unique_ptr<Blip_Buffer> m_buffer;

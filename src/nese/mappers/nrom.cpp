@@ -1,6 +1,8 @@
 #include "nrom.h"
 #include "../bus.h"
-#include "YBaseLib/Error.h"
+
+#include "common/align.h"
+#include "common/error.h"
 
 namespace Mappers {
 NROM::NROM() = default;
@@ -14,8 +16,7 @@ bool NROM::Initialize(CartridgeData& data, Error* error)
 
   if (!Common::IsAlignedPow2(m_prg_rom.size(), PRG_ROM_BANK_SIZE))
   {
-    error->SetErrorUserFormatted(1, "PRG-ROM (%u) must be aligned to %u bytes.", u32(m_prg_rom.size()),
-                                 PRG_ROM_BANK_SIZE);
+    Error::SetStringFmt(error, "PRG-ROM ({}) must be aligned to {} bytes.", m_prg_rom.size(), PRG_ROM_BANK_SIZE);
     return false;
   }
 
@@ -28,7 +29,9 @@ bool NROM::Initialize(CartridgeData& data, Error* error)
   return true;
 }
 
-void NROM::Reset() {}
+void NROM::Reset()
+{
+}
 
 u8 NROM::ReadCPUAddress(Bus* bus, u16 address)
 {
@@ -38,5 +41,7 @@ u8 NROM::ReadCPUAddress(Bus* bus, u16 address)
     return m_prg_rom[address & 0x3FFF];
 }
 
-void NROM::WriteCPUAddress(Bus* bus, u16 address, u8 value) {}
+void NROM::WriteCPUAddress(Bus* bus, u16 address, u8 value)
+{
+}
 } // namespace Mappers

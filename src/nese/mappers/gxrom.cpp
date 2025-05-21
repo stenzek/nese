@@ -1,6 +1,8 @@
 #include "gxrom.h"
 #include "../bus.h"
-#include "YBaseLib/Error.h"
+
+#include "common/align.h"
+#include "common/error.h"
 
 namespace Mappers {
 GxROM::GxROM() = default;
@@ -14,15 +16,13 @@ bool GxROM::Initialize(CartridgeData& data, Error* error)
 
   if (!Common::IsAlignedPow2(m_prg_rom.size(), PRG_ROM_BANK_SIZE))
   {
-    error->SetErrorUserFormatted(1, "PRG-ROM (%u) must be aligned to %u bytes.", u32(m_prg_rom.size()),
-                                 PRG_ROM_BANK_SIZE);
+    Error::SetStringFmt(error, "PRG-ROM ({}) must be aligned to {} bytes.", m_prg_rom.size(), PRG_ROM_BANK_SIZE);
     return false;
   }
 
   if (!Common::IsAlignedPow2(m_chr_rom.size(), CHR_ROM_BANK_SIZE))
   {
-    error->SetErrorUserFormatted(1, "CHR-ROM (%u) must be aligned to %u bytes.", u32(m_chr_rom.size()),
-                                 CHR_ROM_BANK_SIZE);
+    Error::SetStringFmt(error, "CHR-ROM ({}) must be aligned to {} bytes.", u32(m_chr_rom.size()), CHR_ROM_BANK_SIZE);
     return false;
   }
 

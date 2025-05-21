@@ -4,8 +4,9 @@
 #include <vector>
 
 class Bus;
-class ByteStream;
 class Error;
+
+class Retro2FileHandleWrap;
 
 class Cartridge
 {
@@ -33,7 +34,7 @@ public:
   const DataType& GetCHRROM() const { return m_chr_rom; }
   const DataType& GetPRGRAM() const { return m_prg_ram; }
   const DataType& GetCHRRAM() const { return m_chr_ram; }
-  const MirrorMode GetMirrorMode() const { return m_mirror; }
+  MirrorMode GetMirrorMode() const { return m_mirror; }
 
   // mapper
   virtual void Reset();
@@ -43,10 +44,10 @@ public:
   virtual void WritePPUAddress(Bus* bus, u16 address, u8 value);
   virtual void PPUScanline(Bus* bus, u32 line, bool rendering_enabled);
 
-  static std::unique_ptr<Cartridge> Load(ByteStream* stream, Error* error);
+  static std::unique_ptr<Cartridge> Load(const char* path, Error* error);
 
 private:
-  static std::unique_ptr<Cartridge> LoadINES(ByteStream* stream, Error* error);
+  static std::unique_ptr<Cartridge> LoadINES(Retro2FileHandleWrap& fh, Error* error);
 
 protected:
   struct CartridgeData

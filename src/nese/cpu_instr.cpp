@@ -1,10 +1,9 @@
-#include "YBaseLib/Assert.h"
-#include "YBaseLib/Log.h"
-#include "YBaseLib/Memory.h"
-#include "YBaseLib/String.h"
 #include "nese/cpu.h"
-#include <cstdio>
-Log_SetChannel(CPU);
+
+#include "common/assert.h"
+#include "common/log.h"
+
+LOG_CHANNEL(CPU);
 
 template<void (CPU::*instruction)(u8)>
 void CPU::WrapReadAccumulator()
@@ -319,13 +318,13 @@ void CPU::WrapWriteIndirectIndexed()
 
 void CPU::INSTR_unhandled()
 {
-  SmallString disasm;
+  char buf[256];
   u16 cur = m_registers.PC - 1;
   u16 size;
   for (u16 i = 0; i < 3; i++)
   {
-    if (Disassemble(&disasm, cur, &size))
-      Log_DevPrint(disasm.GetCharArray());
+    if (Disassemble(buf, sizeof(buf), cur, &size))
+      DEV_LOG(buf);
     else
       break;
 
@@ -337,9 +336,9 @@ void CPU::INSTR_unhandled()
 
 void CPU::INSTR_invalid()
 {
-  SmallString disasm;
-  if (Disassemble(&disasm, m_registers.PC - 1, nullptr))
-    Log_DevPrint(disasm.GetCharArray());
+  char buf[256];
+  if (Disassemble(buf, sizeof(buf), m_registers.PC - 1, nullptr))
+    DEV_LOG(buf);
 
   Panic("Unimplemented instruction");
 }

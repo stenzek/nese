@@ -1,13 +1,14 @@
 #include "ppu.h"
-#include "YBaseLib/Assert.h"
-#include "YBaseLib/Error.h"
-#include "YBaseLib/Log.h"
-#include "YBaseLib/Memory.h"
 #include "bus.h"
-#include "common/display.h"
+#include "common/assert.h"
+#include "common/bitutils.h"
+#include "common/log.h"
 #include "cpu.h"
 #include "system.h"
-Log_SetChannel(PPU);
+
+#include "retro2/retro2_framebuffer.h"
+
+LOG_CHANNEL(PPU);
 
 #if 0
 static const uint32 PALETTE[] = {
@@ -31,13 +32,12 @@ PPU::PPU() = default;
 
 PPU::~PPU() = default;
 
-void PPU::Initialize(System* system, Bus* bus, Display* display)
+void PPU::Initialize(System* system, Bus* bus)
 {
   m_system = system;
   m_bus = bus;
-  m_display = display;
 
-  m_display->ResizeFramebuffer(SCREEN_WIDTH, SCREEN_HEIGHT);
+  m_framebuffer = std::make_unique<u32[]>(SCREEN_WIDTH * SCREEN_HEIGHT);
 }
 
 void PPU::Reset()
@@ -45,9 +45,9 @@ void PPU::Reset()
   m_current_cycle = 340;
   m_current_scanline = 240;
 
-  Y_memzero(m_palette_ram, sizeof(m_palette_ram));
+  std::memset(m_palette_ram, 0, sizeof(m_palette_ram));
   std::memset(m_oam_ram, 0xFF, sizeof(m_oam_ram));
-  Y_memzero(&m_regs, sizeof(m_regs));
+  std::memset(&m_regs, 0, sizeof(m_regs));
   m_f = 0;
   m_register = 0;
   m_nmi_enable = false;
@@ -234,7 +234,7 @@ void PPU::WriteAddress(u8 value)
   else
   {
     m_regs.t.address_low = value;
-    m_regs.v.address = m_regs.t.address;
+    m_regs.v.address = m_regs.t.address.GetValue();
     m_regs.address_latch = 0;
   }
 }
@@ -288,7 +288,7 @@ void PPU::WriteDMA(u8 value)
   {
     // Otherwise, we have to do byte reads (in case it's registers, or IO space, etc.)
     for (u32 i = 0; i < OAM_RAM_SIZE; i++)
-      oam_buffer[i] = m_bus->ReadCPUAddress(start_address + i);
+      oam_buffer[i] = m_bus->ReadCPUAddress(Truncate16(start_address + i));
   }
 
   m_bus->StallCPU(513);
@@ -432,7 +432,7 @@ void PPU::RenderPixel()
     color = sprite_color;
 
   DebugAssert(color < countof(m_palette_ram));
-  m_display->SetPixel(x, y, PALETTE[m_palette_ram[color] % countof(PALETTE)]);
+  m_framebuffer[y * SCREEN_WIDTH + x] = PALETTE[m_palette_ram[color] % countof(PALETTE)];
 }
 
 void PPU::EvaluateSprite()
@@ -547,7 +547,8 @@ void PPU::Execute(CycleCount cycles)
         if (m_current_scanline == 240)
         {
           m_nmi_hold = true;
-          m_display->DisplayFramebuffer();
+          R2Video.UploadFramebuffer(SCREEN_WIDTH, SCREEN_HEIGHT, RETRO2_PIXEL_FORMAT_RGBA8, m_framebuffer.get(),
+                                    SCREEN_WIDTH * sizeof(u32));
           m_system->EndFrame();
         }
         else if (m_current_scanline == 260)
@@ -646,14 +647,14 @@ void PPU::Execute(CycleCount cycles)
     {
       if (IsRenderingEnabled())
       {
-        m_regs.v.nametable_x = m_regs.t.nametable_x;
-        m_regs.v.tile_x = m_regs.t.tile_x;
+        m_regs.v.nametable_x = m_regs.t.nametable_x.GetValue();
+        m_regs.v.tile_x = m_regs.t.tile_x.GetValue();
       }
     }
     else if (m_current_cycle == 305)
     {
       if (m_current_scanline == 261 && IsRenderingEnabled())
-        m_regs.v.address = m_regs.t.address;
+        m_regs.v.address = m_regs.t.address.GetValue();
     }
     else if (m_current_cycle == 341)
     {

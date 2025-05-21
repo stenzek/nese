@@ -1,6 +1,9 @@
 #include "mmc1.h"
 #include "../bus.h"
-#include "YBaseLib/Error.h"
+
+#include "common/align.h"
+#include "common/assert.h"
+#include "common/error.h"
 
 namespace Mappers {
 MMC1::MMC1() = default;
@@ -14,15 +17,13 @@ bool MMC1::Initialize(CartridgeData& data, Error* error)
 
   if (!Common::IsAlignedPow2(m_prg_rom.size(), PRG_ROM_BANK_SIZE))
   {
-    error->SetErrorUserFormatted(1, "PRG-ROM (%u) must be aligned to %u bytes.", u32(m_prg_rom.size()),
-                                 PRG_ROM_BANK_SIZE);
+    Error::SetStringFmt(error, "PRG-ROM ({}) must be aligned to {} bytes.", m_prg_rom.size(), PRG_ROM_BANK_SIZE);
     return false;
   }
 
   if (!Common::IsAlignedPow2(m_chr_rom.size(), CHR_ROM_BANK_SIZE))
   {
-    error->SetErrorUserFormatted(1, "CHR-ROM (%u) must be aligned to %u bytes.", u32(m_chr_rom.size()),
-                                 CHR_ROM_BANK_SIZE);
+    Error::SetStringFmt(error, "CHR-ROM (%u) must be aligned to %u bytes.", m_chr_rom.size(), CHR_ROM_BANK_SIZE);
     return false;
   }
 
@@ -207,6 +208,8 @@ void MMC1::UpdatePRGBaseAddresses()
       bank_1 = m_prg_rom_bank_count - 1;
     }
     break;
+
+      DefaultCaseIsUnreachable()
   }
 
   m_base_prg_address_8000 = (u32(bank_0) << 14) % m_prg_rom.size();

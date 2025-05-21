@@ -4,6 +4,8 @@
 class Controller
 {
 public:
+  virtual ~Controller();
+
   virtual void WriteStrobe(bool active) = 0;
   virtual uint8 ReadData() = 0;
 };

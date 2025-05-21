@@ -1,14 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="audio.h" />
-    <ClInclude Include="bitfield.h" />
-    <ClInclude Include="display.h" />
+    <ClInclude Include="md5_digest.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="assert.h" />
+    <ClInclude Include="windows_headers.h" />
+    <ClInclude Include="heap_array.h" />
+    <ClInclude Include="error.h" />
+    <ClInclude Include="path.h" />
+    <ClInclude Include="log_channels.h" />
+    <ClInclude Include="log.h" />
+    <ClInclude Include="timer.h" />
+    <ClInclude Include="crc32.h" />
+    <ClInclude Include="string_util.h" />
+    <ClInclude Include="bitfield.h" />
+    <ClInclude Include="bitutils.h" />
+    <ClInclude Include="align.h" />
+    <ClInclude Include="wav_reader_writer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="audio.cpp" />
-    <ClCompile Include="display.cpp" />
+    <ClCompile Include="md5_digest.cpp" />
+    <ClCompile Include="assert.cpp" />
+    <ClCompile Include="error.cpp" />
+    <ClCompile Include="log.cpp" />
+    <ClCompile Include="timer.cpp" />
+    <ClCompile Include="crc32.cpp" />
+    <ClCompile Include="string_util.cpp" />
+    <ClCompile Include="wav_reader_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="bitfield.natvis" />

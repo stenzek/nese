@@ -1,5 +1,9 @@
 #include "controller.h"
 
+Controller::~Controller()
+{
+}
+
 StandardController::StandardController() = default;
 
 void StandardController::WriteStrobe(bool active)
