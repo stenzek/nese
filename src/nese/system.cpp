@@ -15,6 +15,8 @@
 #include "retro2/retro2_error.h"
 #include "retro2/retro2_filesystem.h"
 #include "retro2/retro2_framebuffer.h"
+#include "retro2/retro2_interface_loader.h"
+#include "retro2/retro2_log.h"
 #include "retro2/retro2_session.h"
 #include "retro2/retro2_settings.h"
 
@@ -295,9 +297,23 @@ bool Retro2GetCoreSessionProvider(IRetro2CoreSessionProvider* prov, Retro2Error*
 bool Retro2CoreInit(const Retro2CoreInitParams* params, Retro2CoreInitInfo* info, Retro2Error* error)
 {
   R2Error = *params->IError;
-  R2Settings = *params->ISettings;
-  R2FileSystem = *params->IFileSystem;
-  Log::Initialize(params->ILog);
+
+  const IRetro2Log* ilog =
+    static_cast<const IRetro2Log*>(params->QueryInterface(RETRO2_INTERFACE_LOG, RETRO2_LOG_INTERFACE_VERSION, error));
+  if (!ilog)
+  {
+    R2Error.SetErrorString(error, "Log interface is required.");
+    return false;
+  }
+
+  static constexpr const Retro2InterfaceLoadEntry s_load_entries[] = {
+    RETRO2_INTERFACE_LOAD_ENTRY(R2FileSystem, FILESYSTEM),
+    RETRO2_INTERFACE_LOAD_ENTRY(R2Settings, SETTINGS),
+  };
+  if (!Retro2LoadInterfaces(params, s_load_entries, std::size(s_load_entries), error))
+    return false;
+
+  Log::Initialize(ilog);
 
   info->CoreName = "r2nes";
   info->MinimumSaveStateVersion = 0;
